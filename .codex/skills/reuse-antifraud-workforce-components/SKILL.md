@@ -1,12 +1,12 @@
 ---
 name: reuse-antifraud-workforce-components
-description: Reuse or implement product-neutral Antifraud workforce components in the generic SOS Gateway Controller Portal. Use for employee invitations, optional departments, operational or professional group membership, shared group authorization, identity-evidence permissions, assignment notifications, or migration away from product-specific controller screens.
+description: Reuse or implement product-neutral Antifraud workforce components in the Antifraud Controller Portal. Use for employee invitations, optional departments, operational or professional group membership, shared group authorization, identity-evidence permissions, assignment notifications, or migration away from product-specific controller screens.
 ---
 
 # Reuse Antifraud Workforce Components
 
-Read `docs/ANTIFRAUD_WORKFORCE_COMPONENT_REUSE.md` completely before changing
-workforce behavior, components, adapters, authorization, or documentation.
+Read `docs/ARCHITECTURE_AND_ACCEPTANCE.md` completely before changing workforce
+behavior, components, adapters, authorization, or documentation.
 
 Preserve these boundaries:
 
@@ -16,7 +16,7 @@ Preserve these boundaries:
 - `antifraud-sdk-node-ts` owns trusted backend adapters.
 - `antifraud-portal-components-react` owns controlled presentation and emits
   typed intentions only.
-- this portal owns SOS routes, localization, session, controller binding,
+- this portal owns application routes, localization, session, controller binding,
   capability resolution, backend calls, and complete journeys.
 - `antifraud-ica-node-ts` owns provider readback, issuance policy, signing, and
   non-personal audit.
