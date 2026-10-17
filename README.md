@@ -4,18 +4,18 @@ Public, sector-neutral organization-controller portal for qualification and
 identity-evidence services.
 
 The controller manages the organization, departments, employees, invitations,
-groups and reusable group authorizations. It never opens student, animal,
-patient, qualification or identity-evidence records. Those operations belong
-to professional portals. The first planned Antifraud professional profile is
-`qualification-education`. Animal-sector workflows remain in the multisector
-VetChain professional portal; there is no separate Antifraud animal portal.
+groups and reusable group authorizations. It also provides controller views of
+the Clearing House inbox. A tenant controller sees only claims addressed to
+its organization and may act or delegate exact review capabilities. A host
+controller sees routing, delivery failures and unclaimed-reference envelopes,
+but has no implicit right to open confidential tenant evidence or decide for a
+tenant. Subject work delegated to employees belongs to role portals.
 
 ## Current state
 
 The local application contains a controlled fixture adapter for UI and
 responsive testing. It reuses `antifraud-portal-components-react`, including
-the workforce component migrated from the public Apache-2.0 UHC component
-package.
+a workforce component migrated from a compatible public Apache-2.0 package.
 
 This is not production or gateway proof. Authentication, authoritative
 organization binding, persistence, notifications and authorization readback
@@ -61,9 +61,12 @@ npm run test:e2e
 
 - `antifraud-portal-components-react` owns controlled, product-neutral UI.
 - This repository owns controller navigation, host state and future BFF calls.
-- Professional portals own sector-specific subjects, evidence and professional
-  policy. VetChain may consume the shared neutral Antifraud components.
+- Role portals own sector-specific subjects, evidence and professional policy.
+  Other public applications may consume the shared neutral components.
 - SDK and gateway packages own trusted transport, policy and persistence.
+- The writing host owns its local addressed-reference index. The issuer's home
+  host performs exact authenticated discovery across approved federation
+  peers; no controller or issuer scans Fabric channels.
 
 See [architecture and acceptance](docs/ARCHITECTURE_AND_ACCEPTANCE.md) and
 [source provenance](docs/PROVENANCE.md).

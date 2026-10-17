@@ -9,5 +9,5 @@ The controlled workforce UI is consumed from
 `OrganizationWorkforceAdministration` and its required styles from the public
 Apache-2.0 `uhc-portal-components-react` source at commit `33d9a8d`.
 
-No UHC, VetChain, SOSChain, tenant, gateway host, personal data, credential or
+No external-product, tenant, gateway host, personal data, credential or
 internal prompt is copied into this public repository.

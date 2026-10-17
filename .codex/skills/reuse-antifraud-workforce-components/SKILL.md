@@ -39,6 +39,18 @@ sign the result as an employer attestation; never impersonate the university
 or licensing body. Preserve any later source credential as an additional proof
 with its own issuer.
 
+Controllers may create review groups for Clearing House work and delegate
+separate capabilities to list addressed items, open permitted evidence,
+compare authoritative records, propose a result, approve it and submit the
+organization's signed decision. The issuer's home host discovers references
+through exact authenticated peer-host queries over host-local indexes. Never
+make a controller, employee or issuer enumerate Fabric channels.
+
+Future machine endpoints and artificial-intelligence agents require their own
+registered service identity, bounded assignment, group membership, capability
+and audit trail. They may propose decisions when authorized but do not inherit
+controller authority or bypass configured human approval.
+
 Treat provenance without authority substitution as the central Antifraud
 invariant. In regulated health use, display and evaluate identity,
 qualification, current professional licence, active employment, group

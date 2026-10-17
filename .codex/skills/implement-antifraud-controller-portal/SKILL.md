@@ -6,14 +6,28 @@ description: Implement or review the public sector-neutral Antifraud organizatio
 # Implement Antifraud Controller Portal
 
 Keep this application limited to organization profile, departments, employees,
-invitations, groups, reusable group authorizations and administrative notices.
-Do not add learner, animal, patient, qualification or evidence-record screens.
+invitations, groups, reusable group authorizations, administrative notices and
+controller Clearing House views. Do not add general learner, animal, patient
+or employee role-work screens.
+
+Distinguish host and tenant controllers. Host controllers operate discovery,
+delivery, retry, dead-letter and unresolved-reference envelopes but cannot
+open confidential tenant evidence or decide for a tenant. Tenant controllers
+see only claims addressed to their verified organization and may act or
+delegate exact inbox capabilities. Delegated employees perform evidence work
+in the applicable role portal.
+
+Reuse the privacy-minimized host observability pattern. Show total and
+per-tenant pending counts, protected destination resolved for authorized
+display, lifecycle, attempts, retry, receipt and safe error state. Tenant
+controllers see only items addressed to their organization. Never render
+message bodies, evidence, tokens or unrestricted diagnostics as observability.
 
 Read `docs/ARCHITECTURE_AND_ACCEPTANCE.md` before changing behavior. Reuse
-controlled components from `antifraud-portal-components-react`. If a public UHC
-component is still required, migrate only the neutral component into the
-shared Antifraud package with Apache-2.0 provenance; do not copy UHC policy or
-application screens here.
+controlled components from `antifraud-portal-components-react`. If a component
+from another public application is still required, migrate only the neutral
+component into the shared package with Apache-2.0 provenance; do not copy the
+source application's policy or screens here.
 
 The browser emits intentions only. The trusted backend resolves controller,
 organization, assignment, membership, reusable group authorization,

@@ -5,16 +5,33 @@
 The controller portal and role portals are different applications.
 
 The controller portal administers organizations, departments, employees,
-invitations, groups and reusable group authorizations. It receives no subject
-record, relationship, source claim or evidence file.
+invitations, groups and reusable group authorizations. It also renders the
+controller views of addressed Clearing House items. This does not turn host
+administration into tenant or evidence authority.
 
-The initial planned Antifraud professional profile is
-`qualification-education`, for authorized education roles. Its implementation
-belongs to a separate repository and remains pending. Animal-sector workflows
-belong to the existing multisector VetChain professional portal, whose home is
-specialized by the active sector and professional role. VetChain may reuse the
-neutral Antifraud components; no separate `qualification-animal` application
-exists.
+A host controller may operate peer discovery, queues, retries, dead letters,
+delivery receipts and unresolved protected organization references. It sees
+only the minimum operational envelope and cannot open confidential evidence or
+submit a tenant decision merely because it operates the host.
+
+Its observability view may show total pending counts and aggregates by tenant,
+addressed destination, domain, lifecycle and delivery state. The portal may
+resolve legal identifier and jurisdiction for the authenticated host
+controller's operational display, but logs, metrics and cross-host indexes use
+protected references. It shows attempts, retry state, receipt and a safe error
+category without bodies, evidence, tokens or unrestricted diagnostics.
+
+A tenant controller may list only items addressed to its verified
+organization. Subject to exact evidence-access policy, it may inspect an item,
+act under controller authority or delegate separate list, open, compare,
+propose, approve and submit capabilities to a group. Delegated employees use a
+role portal; they do not receive controller administration screens.
+
+The initial planned professional profile is `qualification-education`, for
+authorized education roles. Its implementation belongs to a separate
+repository and remains pending. Other sector workflows remain in their owning
+role portals, which may reuse the neutral components without moving their
+sector policy into this application.
 
 ## Shared component boundary
 
@@ -49,7 +66,16 @@ The controller portal is complete only when an executable journey proves:
 5. mismatched organization, inactive assignment, inactive membership, missing
    capability and caller-authored authority fields fail closed; and
 6. a reload reads the authoritative state through portal, BFF, high-level SDK
-   and gateway.
+   and gateway;
+7. a tenant controller sees only its organization's addressed items and can
+   delegate review without creating employee-specific Consent;
+8. a host controller can recover a failed delivery but cannot retrieve the
+   confidential evidence or decide for the tenant; and
+9. the issuer's home host discovers pending references through exact
+   authenticated peer-host queries over local indexes without listing Fabric
+   channels; and
+10. host and tenant observability expose only their authorized pending counts,
+    delivery status, receipts and safe failures.
 
 Unit tests, fixture Playwright, screenshots or a successful response alone do
 not satisfy this condition.
