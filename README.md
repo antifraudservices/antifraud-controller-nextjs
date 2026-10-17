@@ -6,11 +6,9 @@ identity-evidence services.
 The controller manages the organization, departments, employees, invitations,
 groups and reusable group authorizations. It never opens student, animal,
 patient, qualification or identity-evidence records. Those operations belong
-to separate role portals.
-
-The first planned role-portal profiles are `qualification-education` and
-`qualification-animal`. They are intentionally outside this repository and
-are not implemented here.
+to professional portals. The first planned Antifraud professional profile is
+`qualification-education`. Animal-sector workflows remain in the multisector
+VetChain professional portal; there is no separate Antifraud animal portal.
 
 ## Current state
 
@@ -63,7 +61,8 @@ npm run test:e2e
 
 - `antifraud-portal-components-react` owns controlled, product-neutral UI.
 - This repository owns controller navigation, host state and future BFF calls.
-- Role portals own sector-specific subjects, evidence and professional policy.
+- Professional portals own sector-specific subjects, evidence and professional
+  policy. VetChain may consume the shared neutral Antifraud components.
 - SDK and gateway packages own trusted transport, policy and persistence.
 
 See [architecture and acceptance](docs/ARCHITECTURE_AND_ACCEPTANCE.md) and
