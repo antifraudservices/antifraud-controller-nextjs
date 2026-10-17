@@ -4,8 +4,9 @@
 
 This public repository owns only sector-neutral organization-controller UI.
 Do not add student, animal, patient, clinical, qualification or evidence-record
-screens. The planned `qualification-education` and `qualification-animal` role
-portals remain separate.
+screens. The planned `qualification-education` professional portal remains
+separate. Animal-sector workflows belong to the existing multisector VetChain
+professional portal, which may reuse the neutral Antifraud components.
 
 Browser-selected organization, employee, group, role or sector never grants
 authority. Production must fail closed until the trusted backend confirms the

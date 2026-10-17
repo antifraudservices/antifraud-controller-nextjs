@@ -6,7 +6,8 @@ All notable changes to this project are documented here.
 
 - Establish the public Antifraud-owned, sector-neutral controller application,
   separate from the pending `qualification-education` and
-  `qualification-animal` role portals.
+  `qualification-education` professional portal and the existing multisector
+  VetChain professional portal.
 - Consume the controlled Antifraud workforce component migrated from the
   public Apache-2.0 UHC component package with provenance retained.
 - Add the neutral identity-evidence group and exact create, update, evidence,

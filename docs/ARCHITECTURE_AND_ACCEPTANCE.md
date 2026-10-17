@@ -8,13 +8,13 @@ The controller portal administers organizations, departments, employees,
 invitations, groups and reusable group authorizations. It receives no subject
 record, relationship, source claim or evidence file.
 
-The initial planned role-portal profiles are:
-
-- `qualification-education`, for authorized education roles; and
-- `qualification-animal`, for authorized animal-qualification roles.
-
-These names define application profiles, not controller capabilities. Their
-implementation belongs to separate repositories and remains pending.
+The initial planned Antifraud professional profile is
+`qualification-education`, for authorized education roles. Its implementation
+belongs to a separate repository and remains pending. Animal-sector workflows
+belong to the existing multisector VetChain professional portal, whose home is
+specialized by the active sector and professional role. VetChain may reuse the
+neutral Antifraud components; no separate `qualification-animal` application
+exists.
 
 ## Shared component boundary
 
