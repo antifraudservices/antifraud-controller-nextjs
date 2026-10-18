@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Pin the published `antifraud-portal-components-react@0.1.0` artifact and
+  synchronize the lockfile with its verified registry integrity.
+- Align controller theme variables and responsive workforce selectors with the
+  public component package's neutral `afpc-*` namespace.
+- Keep the browser journey focused on accessible lifecycle behavior instead of
+  private component CSS class names.
 - Establish the public Antifraud-owned, sector-neutral controller application,
   separate from the pending `qualification-education` and
   `qualification-education` professional portal and the existing multisector
