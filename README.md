@@ -21,10 +21,17 @@ Desktop and mobile tests exercise
 the real local UI to backend-for-frontend to Node SDK to gateway path for an
 employee age-over predicate and employer qualification evidence.
 
-This is local in-memory gateway proof, not Fabric, Test Network or production
-proof. The local flow now covers authoritative organization binding,
+The automated browser suite first proves the application boundary with an
+in-memory gateway. Interactive local use targets `local-network` Fabric; the
+in-memory suite is not a substitute for that gate. An explicitly configured
+staging demo may use the same gateway API with a six-second in-memory ledger
+delay so that the MVP can demonstrate asynchronous confirmation without a live
+Fabric dependency. Test Network and production never permit that adapter.
+
+The current flow covers authoritative organization binding,
 notifications and authorization readback within one gateway process. Durable
-persistence and deployed authentication remain open.
+persistence and the real local-network journey remain open until their exact
+transaction and restart-readback tests pass.
 
 The controller also lists Clearing House references addressed to its
 authenticated organization and may confirm or reject a pending reference. The
@@ -57,6 +64,11 @@ Use Node.js 24:
 npm install
 CONTROLLER_DEMO_MODE=true npm run dev
 ```
+
+For an immutable staging demo, set `NODE_ENV=production`,
+`CONTROLLER_DEPLOYMENT_STAGE=staging` and `CONTROLLER_DEMO_MODE=true`; configure
+the gateway itself with the matching staging demo profile. Never use these
+values for Test Network or production.
 
 Validation commands:
 

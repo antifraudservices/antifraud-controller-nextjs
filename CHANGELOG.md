@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Permit the synthetic controller authority only in local development or an
+  explicitly declared staging demo, while Test Network and production remain
+  fail-closed.
+- Document that interactive local portal acceptance targets real
+  `local-network` Fabric and that staging demo persistence uses the same gateway
+  contract with a six-second simulated ledger delay.
 - Pin the verified `antifraud-sdk-node-ts@0.2.2` release, including
   `antifraud-sdk-core-ts@0.1.2` and `antifraud-data-utils-ts@0.1.3`, for the
   explicit three-state issuer-resolution and governed document-CID contracts.
