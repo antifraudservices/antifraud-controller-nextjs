@@ -65,5 +65,16 @@ selects project, region, backend and branch. Use Application Default
 Credentials for Firebase Admin/Firestore and Cloud Secret Manager references
 for secrets. Verify an adapter and its tests before naming it as supported.
 
+Before implementing Google login, read `docs/BETA_FIREBASE_AUTH.md`. Enabling
+the provider is not sufficient: keep a distinct Firebase web-app registration
+for this portal, authorize `localhost` and every deployed portal hostname,
+verify exact Firebase issuer and audience in the BFF, and retain server-side
+controller authorization. Use either the Auth Emulator or live local Google
+login, never a mixture. Preserve popup compatibility with COOP
+`same-origin-allow-popups` where needed and no global COEP `require-corp`.
+The Foundation is a bounded tenant of `host-beta.antifraud.services`; its
+person-index bindings are under `antifraud.online`, not browser-selected portal
+authority.
+
 Never publish with a `file:` dependency, internal prompt, tenant host, secret,
 real personal data or unverified deployment claim.

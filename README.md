@@ -104,6 +104,12 @@ Supabase adapter is object storage, and its MongoDB initializer is not wired as
 an equivalent vault repository; do not present either as a complete database
 profile without the missing adapter and tests.
 
+Firebase Authentication also requires more than enabling the Google provider.
+The project must register this portal's web app, authorize `localhost` and the
+four Beta portal domains, expose only the public web configuration, verify the
+Firebase ID token in the BFF, and preserve popup-compatible response headers.
+Follow the exact [Beta Firebase authentication handoff](docs/BETA_FIREBASE_AUTH.md).
+
 Validation commands:
 
 ```bash
@@ -126,7 +132,10 @@ npm run test:e2e
 
 See [architecture and acceptance](docs/ARCHITECTURE_AND_ACCEPTANCE.md) and
 [the controller parity backlog](docs/CONTROLLER_PARITY_BACKLOG.md). Source
-history is summarized in [provenance](docs/PROVENANCE.md).
+history is summarized in [provenance](docs/PROVENANCE.md). Portal UI is under
+`antifraud.services`; the Foundation is a bounded tenant of
+`host-beta.antifraud.services`, and its person-index services publish verified
+bindings under `antifraud.online`.
 
 ## Licence
 
