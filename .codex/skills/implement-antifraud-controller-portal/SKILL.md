@@ -53,8 +53,11 @@ and gateway.
 For the focused MVP, Demo is the only executable environment. Keep the same
 production-shaped UI, components, options and flows intended for Test Network,
 but use the gateway's six-second in-memory Fabric adapter and label every
-result as simulated. Test Network is visible but disabled until the project
-owner supplies Kubernetes and configuration; Production is disabled. Reuse
+result as simulated. Test Network is visible but disabled through Demo/local
+acceptance and becomes eligible only after the affected real local-network
+gate, cumulative package release, endpoints, credentials and trusted server
+configuration are complete. Its initial single-orderer profile is non-HA and
+non-production. Production is disabled. Reuse
 the existing trusted BFF/gateway collection-prefix resolver and prove Demo
 cannot access either disabled environment. The browser never supplies a
 prefix or environment authority.
@@ -78,3 +81,9 @@ authority.
 
 Never publish with a `file:` dependency, internal prompt, tenant host, secret,
 real personal data or unverified deployment claim.
+
+Never publish an isolated shared package because its own suite is green. Prove
+the complete affected local UI → BFF → high-level SDK → gateway journey and
+real local-network write plus authoritative readback first, using immutable
+tarballs installed `--no-save`; then perform one cumulative dependency-ordered
+release and exact registry pinning.
