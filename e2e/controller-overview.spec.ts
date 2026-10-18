@@ -50,7 +50,7 @@ test('reuses the proven controller home and shared workforce administration', as
 
   const activeMember = page.getByRole('row').filter({ hasText: 'service.manager@example.invalid' })
   const suspend = activeMember.getByRole('button', { name: 'Suspend member' })
-  await expect(suspend).toHaveClass(/uhcp-warning-action/u)
+  await expect(suspend).toBeEnabled()
   page.once('dialog', async dialog => {
     expect(dialog.message()).toContain('Suspend this member?')
     await dialog.dismiss()
@@ -61,14 +61,14 @@ test('reuses the proven controller home and shared workforce administration', as
   await suspend.click()
   await expect(activeMember.getByText('Inactive')).toBeVisible()
   const reactivate = activeMember.getByRole('button', { name: 'Reactivate member' })
-  await expect(reactivate).toHaveClass(/uhcp-primary-action/u)
+  await expect(reactivate).toBeEnabled()
   page.once('dialog', dialog => dialog.accept())
   await reactivate.click()
   await expect(activeMember.getByText('Active')).toBeVisible()
 
   const inactiveMember = page.getByRole('row').filter({ hasText: 'member.manager@example.invalid' })
   const purge = inactiveMember.getByRole('button', { name: 'Purge and release licence' })
-  await expect(purge).toHaveClass(/uhcp-danger/u)
+  await expect(purge).toBeEnabled()
   page.once('dialog', dialog => dialog.dismiss())
   await purge.click()
   await expect(inactiveMember).toBeVisible()

@@ -19,11 +19,16 @@ a { color: inherit; }
 .gate-panel > a { color: var(--portal-accent); font-weight: 700; }
 
 .controller-workspace {
-  --uhcp-action-start: var(--portal-accent);
-  --uhcp-action-end: color-mix(in srgb, var(--portal-accent) 70%, #174da4);
+  --afpc-action-start: var(--portal-accent);
+  --afpc-action-end: color-mix(in srgb, var(--portal-accent) 70%, #174da4);
+  --uhcp-surface: var(--afpc-surface);
+  --uhcp-panel: var(--afpc-panel);
+  --uhcp-text: var(--afpc-text);
+  --uhcp-muted: var(--afpc-muted);
+  --uhcp-border: var(--afpc-border);
   min-height: 100vh;
-  color: var(--uhcp-text);
-  background: var(--uhcp-surface);
+  color: var(--afpc-text);
+  background: var(--afpc-surface);
 }
 .controller-header {
   position: sticky;
@@ -67,11 +72,11 @@ a { color: inherit; }
 .controller-card:is(:hover, :focus-visible) small, .controller-card:is(:hover, :focus-visible) > span { color: #fff; }
 .workspace-back { margin-bottom: 20px; cursor: pointer; }
 
-.shared-workforce-wrapper, .shared-workforce-wrapper .uhcp-workforce, .shared-workforce-wrapper .uhcp-workforce-panel, .shared-workforce-wrapper .uhcp-table-scroll { min-width: 0; max-width: 100%; }
-.shared-workforce-wrapper .uhcp-table-scroll { width: 100%; overflow-x: auto; }
-.shared-workforce-wrapper .uhcp-workforce table { min-width: 800px; }
-.shared-workforce-wrapper .uhcp-row-actions { align-items: stretch; min-width: 250px; }
-.shared-workforce-wrapper .uhcp-row-actions button { flex: 1 1 0; min-width: 0; padding: .55rem .45rem; font-size: 11px; white-space: normal; }
+.shared-workforce-wrapper, .shared-workforce-wrapper .afpc-workforce, .shared-workforce-wrapper .afpc-workforce-panel, .shared-workforce-wrapper .afpc-table-scroll { min-width: 0; max-width: 100%; }
+.shared-workforce-wrapper .afpc-table-scroll { width: 100%; overflow-x: auto; }
+.shared-workforce-wrapper .afpc-workforce table { min-width: 800px; }
+.shared-workforce-wrapper .afpc-row-actions { align-items: stretch; min-width: 250px; }
+.shared-workforce-wrapper .afpc-row-actions button { flex: 1 1 0; min-width: 0; padding: .55rem .45rem; font-size: 11px; white-space: normal; }
 .current-controller-summary { margin-bottom: 18px; padding: 14px 18px; border: 1px solid var(--uhcp-border); border-radius: 16px; background: var(--uhcp-panel); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .current-controller-summary > span:first-child { display: grid; gap: 3px; }
 .current-controller-summary small { color: var(--uhcp-muted); }
