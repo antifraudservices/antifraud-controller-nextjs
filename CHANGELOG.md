@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Pin the verified `antifraud-sdk-node-ts@0.2.2` release, including
+  `antifraud-sdk-core-ts@0.1.2` and `antifraud-data-utils-ts@0.1.3`, for the
+  explicit three-state issuer-resolution and governed document-CID contracts.
 - Replace browser-only workforce fixtures with authenticated gateway state for
   organization, licences, employees, invitations, devices, groups,
   departments, memberships, reusable authorizations and notifications.
