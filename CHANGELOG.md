@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Define Demo as the only executable MVP environment, with Test Network gated
+  on owner-provided Kubernetes, Production disabled and server-owned
+  collection-prefix isolation.
 - Publish the controller delivery gates as repository-owned GitHub issues and
   link the parity backlog to their executable acceptance work.
 - Permit the synthetic controller authority only in local development or an

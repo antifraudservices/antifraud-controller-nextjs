@@ -50,5 +50,20 @@ Playwright. Fixture Playwright is visual and interaction proof only; completion
 requires authoritative persistence and readback through the real backend, SDK
 and gateway.
 
+For the focused MVP, Demo is the only executable environment. Keep the same
+production-shaped UI, components, options and flows intended for Test Network,
+but use the gateway's six-second in-memory Fabric adapter and label every
+result as simulated. Test Network is visible but disabled until the project
+owner supplies Kubernetes and configuration; Production is disabled. Reuse
+the existing trusted BFF/gateway collection-prefix resolver and prove Demo
+cannot access either disabled environment. The browser never supplies a
+prefix or environment authority.
+
+When preparing Firebase App Hosting, never request or commit a service-account
+key. The project owner authorizes the official Firebase GitHub application and
+selects project, region, backend and branch. Use Application Default
+Credentials for Firebase Admin/Firestore and Cloud Secret Manager references
+for secrets. Verify an adapter and its tests before naming it as supported.
+
 Never publish with a `file:` dependency, internal prompt, tenant host, secret,
 real personal data or unverified deployment claim.

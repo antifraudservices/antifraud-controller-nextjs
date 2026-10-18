@@ -81,9 +81,10 @@ The controller portal is complete only when an executable journey proves:
 Unit tests, fixture Playwright, screenshots or a successful response alone do
 not satisfy this condition.
 
-The current local increment proves UI to backend-for-frontend to Node SDK to
-in-memory gateway writes and authoritative readback for organization,
+The current increment proves UI to backend-for-frontend to Node SDK to
+in-memory gateway writes and authoritative Demo readback for organization,
 workforce, reusable authorizations, notifications, identity age-over and
-employer qualification evidence. It does not yet satisfy the deployed-network
-condition because durable Fabric restart/readback, Clearing House federation
-and Test Network journeys have not been proven.
+employer qualification evidence. Demo is the MVP target and uses the
+six-second simulated Fabric boundary. Test Network remains disabled until the
+project owner supplies Kubernetes and configuration; Production is disabled.
+Neither deployed environment is an MVP completion condition.

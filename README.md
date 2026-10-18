@@ -21,17 +21,17 @@ Desktop and mobile tests exercise
 the real local UI to backend-for-frontend to Node SDK to gateway path for an
 employee age-over predicate and employer qualification evidence.
 
-The automated browser suite first proves the application boundary with an
-in-memory gateway. Interactive local use targets `local-network` Fabric; the
-in-memory suite is not a substitute for that gate. An explicitly configured
-staging demo may use the same gateway API with a six-second in-memory ledger
-delay so that the MVP can demonstrate asynchronous confirmation without a live
-Fabric dependency. Test Network and production never permit that adapter.
+The MVP delivery target is Demo. It uses the normal UI, BFF, public Node SDK
+and gateway contracts with the six-second in-memory Fabric adapter. Demo must
+keep the same components, options, validation and business flows designed for
+future Test Network use, while every simulated transaction and receipt remains
+visibly non-Fabric. Test Network is visible but disabled until the project
+owner supplies Kubernetes and configuration. Production is disabled.
 
-The current flow covers authoritative organization binding,
-notifications and authorization readback within one gateway process. Durable
-persistence and the real local-network journey remain open until their exact
-transaction and restart-readback tests pass.
+The current flow covers authoritative organization binding, notifications and
+authorization readback within one gateway process. Completing all Demo
+journeys and their authoritative Demo readback remains open. Kubernetes,
+local-network Fabric and Test Network deployment are later work, not MVP gates.
 
 The controller also lists Clearing House references addressed to its
 authenticated organization and may confirm or reject a pending reference. The
@@ -78,10 +78,31 @@ npm install
 CONTROLLER_DEMO_MODE=true npm run dev
 ```
 
-For an immutable staging demo, set `NODE_ENV=production`,
-`CONTROLLER_DEPLOYMENT_STAGE=staging` and `CONTROLLER_DEMO_MODE=true`; configure
-the gateway itself with the matching staging demo profile. Never use these
-values for Test Network or production.
+Demo is the only enabled MVP profile. Existing deployment-stage configuration
+must resolve Demo on the trusted server; the browser never chooses an adapter,
+collection prefix, tenant, network, channel or chaincode. Test Network and
+Production controls remain disabled and their server routes fail closed.
+
+The BFF and gateway reuse their configured collection-prefix resolver so Demo
+cannot read, write, search or enumerate Test Network or Production data. Do not
+invent a second prefix mechanism or accept a prefix from React.
+
+## Demo hosting handoff
+
+The portal may be deployed as a Firebase App Hosting backend connected to this
+GitHub repository. Bolt or another implementation agent prepares configuration
+but never receives a service-account JSON key or raw hosting credentials. The
+project owner authorizes the official Firebase GitHub application and selects
+the Firebase project, region, backend and live branch in Firebase Console.
+Runtime Firebase Admin/Firestore access uses Application Default Credentials;
+secret values remain in Cloud Secret Manager and are referenced by name from
+`apphosting.yaml`.
+
+Prefer the reviewed Firestore vault for the low-infrastructure hosted Demo.
+The shared gateway also proves PostgreSQL plus local IPFS. Its current
+Supabase adapter is object storage, and its MongoDB initializer is not wired as
+an equivalent vault repository; do not present either as a complete database
+profile without the missing adapter and tests.
 
 Validation commands:
 
