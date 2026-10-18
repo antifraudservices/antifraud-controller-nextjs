@@ -56,6 +56,19 @@ Joining a group does not create an employee-specific Consent. Invitations and
 membership changes may generate Communication notices, but a notification is
 not authorization.
 
+Reuse the wallet, secure-message and managed-profile security already
+implemented by the shared core and Node.js SDKs. React never generates or
+receives private keys and the portal does not reimplement cryptography. When a
+controller action requires a natural-person signature, Dynamic Client
+Registration exposes the separate signing public key while the private key
+remains protected by the wallet. A cloud-managed wallet requires local
+biometric unlock when available, with a governed PIN or password fallback. The
+ceremony authorizes only a short-lived session bound to the authenticated user,
+registered device, exact operation and document manifest. The BFF invokes the
+managed wallet through the high-level SDK and returns only the proof and
+receipt; lock, expiry, cancellation, replay or binding failure invalidates the
+session. Authentication, approval, delivery and read state are not signatures.
+
 ## Local validation
 
 Use Node.js 24:
