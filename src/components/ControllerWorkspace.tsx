@@ -15,8 +15,9 @@ import {
   type OperationalGroupTemplate,
   type OrganizationDepartment,
 } from './OrganizationStructureAdministration'
+import { EvidenceAdministration } from './EvidenceAdministration'
 
-type WorkspaceView = 'home' | 'organization' | 'members' | 'structure'
+type WorkspaceView = 'home' | 'organization' | 'members' | 'structure' | 'evidence'
 
 const WORKFORCE_COPY: OrganizationWorkforceCopy = Object.freeze({
   title: 'Members and devices',
@@ -97,6 +98,7 @@ const workspaceCards: readonly Readonly<{ view: WorkspaceView; title: string; de
   { view: 'organization', title: 'Organization information', description: 'Manage public identity, verified details, locations, departments and services.' },
   { view: 'members', title: 'Members and devices', description: 'Manage licences, invitations, members and registered devices.' },
   { view: 'structure', title: 'Groups and departments', description: 'Organize employees and assign narrow administrative eligibility.' },
+  { view: 'evidence', title: 'Identity and qualification evidence', description: 'Prepare employee identity checks, age-over predicates and employer-reviewed qualification evidence.' },
 ])
 
 function InformationalPanel({ title, children }: Readonly<{ title: string; children: React.ReactNode }>) {
@@ -154,7 +156,7 @@ export function ControllerWorkspace({ portalName, organizationName }: Readonly<{
     setDepartments(current => [...current, { id: `department-${current.length + 1}`, name }])
   }
 
-  return <div className="controller-workspace" data-reuse-source="antifraud-portal-components-react@0.1.0-local">
+  return <div className="controller-workspace" data-reuse-source="antifraud-portal-components-react@0.1.0">
     <header className="controller-header">
       <button type="button" className="controller-brand" onClick={() => open('home')} aria-label={`${portalName} home`}>
         <span className="controller-mark" aria-hidden="true">◇</span><span><strong>{portalName}</strong><small>Organization controller</small></span>
@@ -213,6 +215,7 @@ export function ControllerWorkspace({ portalName, organizationName }: Readonly<{
         </div> : null}
         {view === 'organization' ? <InformationalPanel title="Organization information"><p>Public identity, verified legal details, locations, departments and service configuration are loaded from the trusted gateway adapter.</p><dl className="controller-facts"><div><dt>Organization</dt><dd>{organizationName}</dd></div><div><dt>Connection</dt><dd>Gateway adapter required</dd></div></dl></InformationalPanel> : null}
         {view === 'structure' ? <OrganizationStructureAdministration employees={employees} groups={groups} departments={departments} memberships={memberships} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
+        {view === 'evidence' ? <EvidenceAdministration /> : null}
       </>}
     </main>
   </div>

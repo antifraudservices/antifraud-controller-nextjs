@@ -1,4 +1,4 @@
-// Flow contract: 1. A local verified controller enters the sector-neutral Antifraud controller home. 2. Qualification-sector subject work is absent. 3. The user opens Members and devices and manages confirmed lifecycle actions. 4. Each employee expands to editable group and department memberships and the directory can be filtered. 5. The controller assigns the identity-evidence group and reviews its exact reusable capabilities. 6. The Groups and departments workspace lists members per group and creates neutral groups and departments. Authorization invariant: fixture selection grants no gateway or qualification-sector authority; assignments are displayed as server-owned administrative intent only. Persistence invariant: this journey performs no network write and production mode remains disabled.
+// Flow contract: 1. A local verified controller enters the sector-neutral controller home. 2. The user opens Members and devices and manages confirmed lifecycle actions. 3. Each employee expands to editable group and department memberships. 4. The controller assigns the identity-evidence group and reviews its exact reusable capabilities. 5. The Groups and departments workspace creates neutral groups and departments. 6. The Evidence workspace sends employee age-over and employer qualification evidence through the real local UI -> BFF -> high-level SDK -> gateway path and receives transaction identifiers. Authorization invariant: the browser never supplies actor, assignment, group authorization, zone, channel or smart-contract authority; the local gateway fixture resolves them from the server bearer. Persistence invariant: the local in-memory gateway performs authoritative readback for its process lifetime; this is not Fabric or Test Network proof.
 import { expect, test } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
@@ -12,8 +12,12 @@ function evidencePath(projectName: string, action: string): string {
 
 test('reuses the proven controller home and shared workforce administration', async ({ page }, testInfo) => {
   const errors: string[] = []
+  const evidenceIntents: string[] = []
   const mobile = testInfo.project.name.includes('mobile')
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
+  page.on('request', request => {
+    if (request.url().includes('/api/evidence/')) evidenceIntents.push(request.postData() ?? '')
+  })
 
   await page.goto('/')
   await expect(page).toHaveTitle(/Antifraud Controller/u)
@@ -22,6 +26,7 @@ test('reuses the proven controller home and shared workforce administration', as
   await expect(page.locator('.controller-card').getByText('Organization information')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Members and devices')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Groups and departments')).toBeVisible()
+  await expect(page.locator('.controller-card').getByText('Identity and qualification evidence')).toBeVisible()
   await expect(page.getByText('Availability and appointments')).toHaveCount(0)
 
   const homeText = await page.locator('body').innerText()
@@ -105,5 +110,39 @@ test('reuses the proven controller home and shared workforce administration', as
   await expect(page.getByText('Manage appointments')).toHaveCount(0)
   await page.screenshot({ path: evidencePath(testInfo.project.name, 'groups-and-departments'), fullPage: true })
 
+  await page.getByRole('button', { name: 'Identity and qualification evidence' }).click()
+  await expect(page.getByRole('heading', { name: 'Identity evidence' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Employee qualification evidence' })).toBeVisible()
+  const identityEvidence = page.locator('section[aria-labelledby="identity-evidence-editor-title"]')
+  await identityEvidence.getByRole('combobox').nth(0).selectOption('member-1')
+  await identityEvidence.getByRole('combobox').nth(1).selectOption('age-over')
+  await identityEvidence.getByRole('spinbutton', { name: 'Age threshold' }).fill('21')
+  await identityEvidence.getByRole('textbox', { name: 'Evidence check reference' }).fill('check:local:age-over-21')
+  await identityEvidence.getByRole('button', { name: 'Record evidence' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'Identity evidence recorded' })).toContainText('tx:identity:')
+  const qualificationEvidence = page.locator('section[aria-labelledby="qualification-evidence-editor-title"]')
+  await qualificationEvidence.getByRole('combobox').nth(0).selectOption('member-1')
+  await qualificationEvidence.getByRole('textbox', { name: 'Qualification title' }).fill('Example degree')
+  await qualificationEvidence.getByRole('textbox', { name: 'Qualification identifier', exact: true }).fill('DEGREE-001')
+  await qualificationEvidence.getByRole('textbox', { name: 'Identifier system' }).fill('https://credentials.example.invalid')
+  await qualificationEvidence.getByRole('textbox', { name: 'Issuer legal identifier' }).fill('EXAMPLE-UNIVERSITY')
+  await qualificationEvidence.getByRole('textbox', { name: 'Issuer jurisdiction' }).fill('ES')
+  await qualificationEvidence.getByRole('button', { name: 'Find authoritative issuer' }).click()
+  await expect(qualificationEvidence.getByText('Authoritative organization resolved')).toBeVisible()
+  await qualificationEvidence.locator('input[type="file"]').setInputFiles({
+    name: 'example-degree.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n% local fixture\n'),
+  })
+  await expect(qualificationEvidence.getByText('Content identifier')).toBeVisible()
+  await qualificationEvidence.getByRole('checkbox').check()
+  await qualificationEvidence.getByRole('button', { name: 'Record employer attestation' }).click()
+  await expect(qualificationEvidence.getByText('Issuer confirmation queued')).toBeVisible()
+  await expect(qualificationEvidence.getByText(/^tx:/u)).toBeVisible()
+  await expect(page.getByText('Veterinary')).toHaveCount(0)
+  await page.screenshot({ path: evidencePath(testInfo.project.name, 'identity-and-qualification-evidence'), fullPage: true })
+
+  expect(evidenceIntents).toHaveLength(2)
+  for (const intent of evidenceIntents) {
+    expect(intent).not.toMatch(/"actor"|"assignmentReference"|"groupAuthorization"|"channel"|"zone"|"smartContract"/u)
+  }
   expect(errors).toEqual([])
 })
