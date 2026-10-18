@@ -27,7 +27,7 @@ async function attachmentFromFile(file: File): Promise<LocalAttachment> {
   return payload
 }
 
-export function EvidenceAdministration() {
+export function EvidenceAdministration({ employees }: Readonly<{ employees: readonly Readonly<{ reference: string; email: string; status: 'active' | 'inactive' }>[] }>) {
   const [identityReceipt, setIdentityReceipt] = useState<{ submission: IdentityEvidenceEditorSubmission; transactionId: string }>()
   const [identityError, setIdentityError] = useState<string>()
   const [issuerResolution, setIssuerResolution] = useState<QualificationEvidenceIssuerResolution>({ phase: 'idle' })
@@ -43,10 +43,7 @@ export function EvidenceAdministration() {
     <div className="evidence-grid">
       <div className="evidence-panel">
         <IdentityEvidenceEditor
-          subjects={[
-            { reference: 'member-1', label: 'service.manager@example.invalid' },
-            { reference: 'member-2', label: 'member.manager@example.invalid', disabled: true },
-          ]}
+          subjects={employees.map(employee => ({ reference: employee.reference, label: employee.email, disabled: employee.status !== 'active' }))}
           onSubmit={submission => {
             setIdentityError(undefined)
             void fetch('/api/evidence/identity', {
@@ -64,10 +61,7 @@ export function EvidenceAdministration() {
       </div>
       <div className="evidence-panel">
         <QualificationEvidenceEditor
-          employees={[
-            { id: 'member-1', label: 'service.manager@example.invalid', active: true },
-            { id: 'member-2', label: 'member.manager@example.invalid', active: false },
-          ]}
+          employees={employees.map(employee => ({ id: employee.reference, label: employee.email, active: employee.status === 'active' }))}
           issuerResolution={issuerResolution}
           delivery={delivery}
           attachment={attachment}

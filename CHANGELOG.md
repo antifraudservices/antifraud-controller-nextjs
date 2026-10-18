@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Replace browser-only workforce fixtures with authenticated gateway state for
+  organization, licences, employees, invitations, devices, groups,
+  departments, memberships, reusable authorizations and notifications.
+- Reload authoritative workspace state after every mutation and prove that it
+  survives a browser reload during the local gateway process.
+- Add optional initial group and department selections to invitations.
+- Add the addressed Clearing House inbox and confirmation or rejection action
+  without exposing confidential evidence or browser-owned authority.
 - Add the neutral controller evidence workspace for employee identity,
   age-over predicates and employer-reviewed qualification evidence.
 - Add desktop and mobile Playwright coverage for the employee age-over editor
@@ -13,16 +21,13 @@ All notable changes to this project are documented here.
   SHA3-384 instead of relying on unsupported browser Web Crypto algorithms.
 - Assert that browser evidence intents contain no actor, assignment, group
   authorization, channel, zone or smart-contract authority.
-- Keep veterinary and other product-role Antifraud actions out of this
-  controller increment.
 - Pin the published `antifraud-portal-components-react@0.1.0` artifact and
   synchronize the lockfile with its verified registry integrity.
 - Align controller theme variables and responsive workforce selectors with the
   public component package's neutral `afpc-*` namespace.
 - Keep the browser journey focused on accessible lifecycle behavior instead of
   private component CSS class names.
-- Establish the public Antifraud-owned, sector-neutral controller application,
-  separate from existing multisector professional portals.
+- Establish the public Antifraud-owned controller application.
 - Consume the controlled Antifraud workforce component migrated from the
   compatible public Apache-2.0 component package with provenance retained.
 - Add the neutral identity-evidence group and exact create, update, evidence,
@@ -40,8 +45,6 @@ All notable changes to this project are documented here.
 - Add employee filtering and collapsible group and department memberships.
 - Add group-centric member lists and creation of neutral employee groups and
   organization departments.
-- Keep scheduling operations outside the controller while allowing a narrow
-  appointment-coordination membership assignment.
 
 ## 0.1.0 - Unreleased
 

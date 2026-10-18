@@ -1,4 +1,4 @@
-// Flow contract: portal branding changes presentation only and cannot configure a sector, tenant identity, authority, subject scope or credential.
+// Flow contract: portal branding changes presentation only and cannot configure tenant identity, authority, subject scope or credentials.
 import { describe, expect, it } from 'vitest'
 import { readPortalConfig } from '../src/config/portal-config'
 
@@ -20,7 +20,7 @@ describe('portal presentation configuration', () => {
   it('rejects unsafe visual configuration and ignores authority-shaped values', () => {
     expect(() => readPortalConfig({ CONTROLLER_PORTAL_LOGO_URL: 'javascript:alert(1)' })).toThrow(/logo/i)
     expect(() => readPortalConfig({ CONTROLLER_PORTAL_ACCENT_COLOR: 'red; background:url(x)' })).toThrow(/accent/i)
-    expect(readPortalConfig({ CONTROLLER_PORTAL_ROLE: 'physician', CONTROLLER_PORTAL_SCOPE: 'patient/*.write' }))
+    expect(readPortalConfig({ CONTROLLER_PORTAL_ROLE: 'reviewer', CONTROLLER_PORTAL_SCOPE: 'subject/*.write' }))
       .not.toHaveProperty('role')
   })
 })

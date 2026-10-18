@@ -27,6 +27,6 @@ export default function HomePage() {
   if (!access.authenticated) return <SignInRequired {...config}/>
 
   return <div style={accentStyle(config.accentColor)}>
-    <ControllerWorkspace portalName={config.name} organizationName="Example Organization" />
+    <ControllerWorkspace portalName={config.name} organizationName="Organization" />
   </div>
 }

@@ -1,4 +1,4 @@
-// Flow contract: verified server evidence grants only explicit organization-controller capabilities and never professional or clinical authority.
+// Flow contract: verified server evidence grants only explicit organization-controller capabilities and never unrelated data authority.
 import { describe, expect, it } from 'vitest'
 import { resolveControllerAccess } from '../src/security/controller-authority'
 import { localDemoAccess } from '../src/security/demo-access'
@@ -13,7 +13,7 @@ describe('controller authority boundary', () => {
       verified: true,
       subject: 'did:web:controller.example',
       organizationId: 'Organization/example',
-      capabilities: ['organization.read', 'members.read', 'members.invite', 'patient.read', 'clinical.write'],
+      capabilities: ['organization.read', 'members.read', 'members.invite', 'unrelated.read', 'unrelated.write'],
     })).toEqual({
       authenticated: true,
       subject: 'did:web:controller.example',

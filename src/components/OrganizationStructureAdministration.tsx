@@ -3,13 +3,14 @@
 import { useDeferredValue, useState, type FormEvent } from 'react'
 import type { WorkforceEmployee } from 'antifraud-portal-components-react'
 
-export type OperationalGroupTemplate = 'client-group-management' | 'appointment-coordination' | 'data-contribution' | 'encounter-transfer-coordination' | 'identity-evidence-administration'
+export type OperationalGroupTemplate = 'identity-evidence-administration' | 'qualification-evidence-administration' | 'clearing-house-review' | 'custom'
 
 export type OperationalGroup = Readonly<{
   id: string
   name: string
   template: OperationalGroupTemplate
   capabilities?: readonly string[]
+  authorizationReference?: string
 }>
 
 export type OrganizationDepartment = Readonly<{
@@ -26,11 +27,10 @@ export type EmployeeOrganizationMembership = Readonly<{
 type MembershipKind = 'group' | 'department'
 
 const GROUP_TEMPLATE_LABELS: Readonly<Record<OperationalGroupTemplate, string>> = Object.freeze({
-  'client-group-management': 'Client group management',
-  'appointment-coordination': 'Appointment coordination assignment',
-  'data-contribution': 'Data contribution without clinical read',
-  'encounter-transfer-coordination': 'Encounter and transfer coordination',
   'identity-evidence-administration': 'Identity evidence administration',
+  'qualification-evidence-administration': 'Qualification evidence administration',
+  'clearing-house-review': 'Clearing House review',
+  custom: 'Custom group without capabilities',
 })
 
 function matchesEmployee(employee: WorkforceEmployee, query: string): boolean {
@@ -108,7 +108,7 @@ export function OrganizationStructureAdministration({
 }>) {
   const [query, setQuery] = useState('')
   const [groupName, setGroupName] = useState('')
-  const [groupTemplate, setGroupTemplate] = useState<OperationalGroupTemplate>('client-group-management')
+  const [groupTemplate, setGroupTemplate] = useState<OperationalGroupTemplate>('identity-evidence-administration')
   const [departmentName, setDepartmentName] = useState('')
   const deferredQuery = useDeferredValue(query.trim().toLocaleLowerCase())
   const visibleGroups = groups.filter(group => {
@@ -137,8 +137,8 @@ export function OrganizationStructureAdministration({
   }
 
   return <section className="organization-structure" aria-labelledby="organization-structure-title">
-    <header className="structure-heading"><div><h2 id="organization-structure-title">Groups and departments</h2><p>Create administrative collections and review their employees. Operational work remains in the corresponding professional portal.</p></div><label className="structure-filter"><span>Filter groups or members</span><input type="search" value={query} onChange={event => setQuery(event.currentTarget.value)} placeholder="Group, department, email or role" /></label></header>
-    <p className="authority-boundary">An appointment-coordination group assigns administrative eligibility only. This controller does not expose availability, calendars or appointment operations.</p>
+    <header className="structure-heading"><div><h2 id="organization-structure-title">Groups and departments</h2><p>Create administrative collections, assign explicit capabilities and review their employees.</p></div><label className="structure-filter"><span>Filter groups or members</span><input type="search" value={query} onChange={event => setQuery(event.currentTarget.value)} placeholder="Group, department, email or role" /></label></header>
+    <p className="authority-boundary">A group records reusable administrative authorization. Each operation still verifies the active employee, membership and exact capability.</p>
 
     <div className="structure-create-grid">
       <form onSubmit={createGroup}><h3>Create an employee group</h3><label><span>Group name</span><input value={groupName} onChange={event => setGroupName(event.currentTarget.value)} required /></label><label><span>Group template</span><select value={groupTemplate} onChange={event => setGroupTemplate(event.currentTarget.value as OperationalGroupTemplate)}>{Object.entries(GROUP_TEMPLATE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><button type="submit">Create group</button></form>
@@ -147,7 +147,7 @@ export function OrganizationStructureAdministration({
 
     <section className="structure-section" aria-labelledby="employee-groups-title"><h3 id="employee-groups-title">Employee groups</h3><div className="structure-card-grid">{visibleGroups.map(group => {
       const memberIds = memberIdsForGroup(memberships, group.id)
-      return <article key={group.id} aria-label={group.name}><header><div><h4>{group.name}</h4><p>{GROUP_TEMPLATE_LABELS[group.template]}</p></div><span>{memberCountLabel(memberIds.size)}</span></header>{group.capabilities?.length ? <div className="group-capabilities" aria-label="Authorized capabilities">{group.capabilities.map(capability => <code key={capability}>{capability}</code>)}</div> : null}<fieldset><legend>Employees</legend>{employees.map(employee => <label key={employee.id}><input type="checkbox" checked={memberIds.has(employee.id)} onChange={event => onMembershipChange(employee.id, 'group', group.id, event.currentTarget.checked)} /><span>{employee.email}<small>{employee.role}</small></span></label>)}</fieldset></article>
+      return <article key={group.id} aria-label={group.name}><header><div><h4>{group.name}</h4><p>{GROUP_TEMPLATE_LABELS[group.template]}</p></div><span>{memberCountLabel(memberIds.size)}</span></header>{group.authorizationReference ? <small>Authorization: {group.authorizationReference}</small> : null}{group.capabilities?.length ? <div className="group-capabilities" aria-label="Authorized capabilities">{group.capabilities.map(capability => <code key={capability}>{capability}</code>)}</div> : null}<fieldset><legend>Employees</legend>{employees.map(employee => <label key={employee.id}><input type="checkbox" checked={memberIds.has(employee.id)} onChange={event => onMembershipChange(employee.id, 'group', group.id, event.currentTarget.checked)} /><span>{employee.email}<small>{employee.role}</small></span></label>)}</fieldset></article>
     })}</div>{visibleGroups.length === 0 ? <p className="structure-empty">No groups match this filter.</p> : null}</section>
 
     <section className="structure-section" aria-labelledby="departments-title"><h3 id="departments-title">Departments</h3><div className="structure-card-grid">{visibleDepartments.map(department => {

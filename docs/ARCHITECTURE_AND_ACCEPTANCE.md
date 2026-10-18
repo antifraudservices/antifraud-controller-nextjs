@@ -1,8 +1,6 @@
 # Architecture and Acceptance
 
-## Application separation
-
-The controller portal and role portals are different applications.
+## Application boundary
 
 The controller portal administers organizations, departments, employees,
 invitations, groups and reusable group authorizations. It also owns the
@@ -28,13 +26,8 @@ organization. Subject to exact evidence-access policy, it may inspect an item,
 act under controller authority or delegate separate list, open, compare,
 propose, approve and submit capabilities to a group. An authorized controller
 or human-resources employee may record evidence about an employee through this
-neutral portal. Other delegated sector work remains in role portals; those
-users do not receive controller administration screens.
-
-Other sector workflows remain in their owning role portals, which may reuse
-the neutral components without moving sector policy into this application.
-The current increment deliberately adds no Antifraud workflow to a
-veterinarian or another sector-specific professional.
+portal. Users without controller administration authority do not receive these
+screens.
 
 ## Shared component boundary
 
@@ -43,7 +36,7 @@ intentions. The host owns authentication, localization, BFF calls and error
 handling. The trusted backend derives all authority fields and returns the
 authoritative result.
 
-The neutral identity-evidence group currently lists:
+The identity-evidence group currently lists:
 
 - `identity.subject.create`
 - `identity.subject.update`
@@ -88,9 +81,9 @@ The controller portal is complete only when an executable journey proves:
 Unit tests, fixture Playwright, screenshots or a successful response alone do
 not satisfy this condition.
 
-The current local evidence increment proves UI to backend-for-frontend to Node
-SDK to in-memory gateway writes and returned transaction identifiers for
-identity age-over and employer qualification evidence. It does not yet satisfy
-the complete condition above because organization/workforce state is still a
-fixture and no Fabric restart/readback, Clearing House federation or Test
-Network journey has been proven.
+The current local increment proves UI to backend-for-frontend to Node SDK to
+in-memory gateway writes and authoritative readback for organization,
+workforce, reusable authorizations, notifications, identity age-over and
+employer qualification evidence. It does not yet satisfy the deployed-network
+condition because durable Fabric restart/readback, Clearing House federation
+and Test Network journeys have not been proven.
