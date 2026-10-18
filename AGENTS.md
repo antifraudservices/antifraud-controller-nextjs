@@ -2,11 +2,11 @@
 
 ## Boundary
 
-This public repository owns only sector-neutral organization-controller UI.
-Do not add student, animal, patient, clinical, qualification or evidence-record
-screens. The planned `qualification-education` professional portal remains
-separate. Animal-sector workflows belong to the existing multisector VetChain
-professional portal, which may reuse the neutral Antifraud components.
+This public repository owns sector-neutral organization-controller UI,
+including controller-authorized employee identity, age-over and employer
+qualification-evidence workflows. Do not add student, animal, patient,
+clinical or other sector-specific professional screens. Sector workflows
+remain in their professional portals, which may reuse neutral components.
 
 Browser-selected organization, employee, group, role or sector never grants
 authority. Production must fail closed until the trusted backend confirms the
@@ -14,8 +14,8 @@ controller, exact organization, assignment, membership, reusable group
 authorization and administrative capability.
 
 Reuse controlled components from `antifraud-portal-components-react`. Do not
-copy UHC product screens or policy. Any migrated public Apache-2.0 component
-must retain source provenance and be neutralized in the shared Antifraud
+copy product screens or sector policy. Any migrated public Apache-2.0 component
+must retain generic source provenance and be neutralized in the shared
 component package before this portal consumes it.
 
 ## Delivery

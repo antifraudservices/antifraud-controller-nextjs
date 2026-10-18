@@ -69,15 +69,16 @@ npm run test:e2e
   plus controller-authorized employee identity, age-over and employer
   qualification-evidence workflows.
 - Role portals own sector-specific professional policy. This increment adds no
-  Antifraud action to a veterinarian or another VetChain role. Other public
-  applications may consume the shared neutral components.
+  Antifraud action to a veterinarian or another sector-specific role. Other
+  public applications may consume the shared neutral components.
 - SDK and gateway packages own trusted transport, policy and persistence.
 - The writing host owns its local addressed-reference index. The issuer's home
   host performs exact authenticated discovery across approved federation
   peers; no controller or issuer scans Fabric channels.
 
 See [architecture and acceptance](docs/ARCHITECTURE_AND_ACCEPTANCE.md) and
-[source provenance](docs/PROVENANCE.md).
+[the controller parity backlog](docs/CONTROLLER_PARITY_BACKLOG.md). Source
+history is summarized in [provenance](docs/PROVENANCE.md).
 
 ## Licence
 

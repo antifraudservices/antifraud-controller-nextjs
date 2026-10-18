@@ -34,7 +34,7 @@ users do not receive controller administration screens.
 Other sector workflows remain in their owning role portals, which may reuse
 the neutral components without moving sector policy into this application.
 The current increment deliberately adds no Antifraud workflow to a
-veterinarian or another VetChain professional.
+veterinarian or another sector-specific professional.
 
 ## Shared component boundary
 
