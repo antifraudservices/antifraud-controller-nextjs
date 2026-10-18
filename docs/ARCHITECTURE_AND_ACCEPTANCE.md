@@ -1,5 +1,10 @@
 # Architecture and Acceptance
 
+Firebase Google authentication and local/App Hosting prerequisites are defined
+in [`BETA_FIREBASE_AUTH.md`](BETA_FIREBASE_AUTH.md). Authentication establishes
+the principal only; every controller capability below remains a separate
+server-side decision.
+
 ## Application boundary
 
 The controller portal administers organizations, departments, employees,
