@@ -2,7 +2,7 @@
   "name": "antifraud-controller-nextjs",
   "version": "0.1.0",
   "private": true,
-  "description": "Public, sector-neutral organization controller portal for Antifraud qualification services.",
+  "description": "Public organization controller portal for Antifraud qualification services.",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=24"
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "antifraud-portal-components-react": "0.1.0",
-    "antifraud-sdk-node-ts": "0.1.0",
+    "antifraud-sdk-node-ts": "0.2.0",
     "next": "16.4.2",
     "react": "19.2.8",
     "react-dom": "19.2.8"

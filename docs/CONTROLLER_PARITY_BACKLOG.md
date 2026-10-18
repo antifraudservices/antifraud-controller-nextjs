@@ -1,46 +1,33 @@
-# Neutral controller parity backlog
+# Controller delivery status
 
-The controller surface must remain in each existing sector portal until this
-neutral portal provides the same neutral behavior through real backend
-contracts. Visual similarity is not parity.
+Implemented and executable locally:
 
-Already present here:
-
-- organization-controller shell and organization context;
-- employee and invitation lists;
-- employee suspend, reactivate and purge interactions;
-- licence totals displayed with the workforce;
-- collapsible employee membership editing;
-- controller-created groups and departments;
-- reusable identity-evidence capabilities attached to a group;
-- employee identity and age-over evidence through the local user interface,
-  backend-for-frontend, public Node SDK and in-memory gateway; and
+- authenticated organization context;
+- gateway-owned employee, invitation, licence and device state;
+- authoritative employee suspend, reactivate and inactive-only purge;
+- persisted group and department creation and employee memberships;
+- reusable group authorization with exact capabilities;
+- Communication notification references for invitation, acceptance,
+  membership and lifecycle changes;
+- authoritative reload through the backend-for-frontend and public Node SDK;
+- addressed Clearing House inbox and controller decision with receipt
+  readback;
+- employee identity and age-over evidence; and
 - employer qualification evidence with PDF, PNG, JPEG or TIFF content hashed
   by the backend as CIDv1 raw with SHA3-384 before the gateway write.
 
-The following neutral functions still have to migrate and pass their complete
-journeys before a sector portal may remove its controller area:
+Deployment gates still open:
 
-- organization discovery, admission, controller activation and controller
-  wallet recovery;
-- authoritative organization legal details, public profile, locations,
-  departments and published services;
-- real licence inventory, purchase, assignment and release rather than fixture
-  totals;
-- employee invitation with optional initial department and groups, invitation
-  notification, acceptance, activation and registered-device state;
-- employee one-time-password recovery and the complete disable, reactivate and
-  purge backend lifecycle;
-- persisted group and department changes plus a Communication notification to
-  the affected employee;
-- server-issued authorization or smart-token readback for group capabilities;
-- host and tenant Clearing House inboxes, retry state, delivery receipts and
-  privacy-minimized observability; and
-- reload and restart proof from authoritative gateway state, followed by the
-  same journeys on the local Fabric network and Test Network.
+- organization discovery, admission, controller activation and wallet
+  recovery;
+- authoritative organization legal details, public profile and locations;
+- real licence purchase and inventory rather than the local five-seat profile;
+- invitation acceptance by the recipient rather than the local fixture;
+- employee one-time-password recovery;
+- host-wide Clearing House retry, dead-letter and privacy-minimized
+  observability; and
+- durable restart proof, followed by the same journeys on the local Fabric
+  network and Test Network.
 
-Animal subject groups, animal permissions, clinical records, research studies,
-appointments and other sector operations are not controller-parity work. They
-remain in the corresponding professional applications. The current increment
-also adds no evidence action to a veterinarian or another sector professional;
-that is a separate role workflow.
+The local in-memory result must not be described as deployed or production
+ready until those gates have passed without skipped tests.
