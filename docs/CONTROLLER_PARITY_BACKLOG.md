@@ -30,8 +30,8 @@ Deployment gates still open:
   recovery](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/5).
 - [Host-wide Clearing House retry, dead-letter and privacy-minimized
   observability](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/6).
-- [Durable restart proof, followed by the same journeys on the local Fabric
-  network and Test Network](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/7).
+- [Complete authoritative Demo journeys and environment-prefix isolation](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/7).
 
-The local in-memory result must not be described as deployed or production
-ready until those gates have passed without skipped tests.
+The Demo result must not be described as Fabric, Test Network, deployed or
+production evidence. Test Network requires owner-provided Kubernetes and
+configuration and is outside this MVP.
