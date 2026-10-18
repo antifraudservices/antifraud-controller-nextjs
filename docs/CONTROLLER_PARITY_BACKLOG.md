@@ -18,16 +18,20 @@ Implemented and executable locally:
 
 Deployment gates still open:
 
-- organization discovery, admission, controller activation and wallet
-  recovery;
-- authoritative organization legal details, public profile and locations;
-- real licence purchase and inventory rather than the local five-seat profile;
-- invitation acceptance by the recipient rather than the local fixture;
-- employee one-time-password recovery;
-- host-wide Clearing House retry, dead-letter and privacy-minimized
-  observability; and
-- durable restart proof, followed by the same journeys on the local Fabric
-  network and Test Network.
+- [Organization discovery, admission, controller activation and wallet
+  recovery](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/1).
+- [Authoritative organization legal details, public profile and
+  locations](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/2).
+- [Real licence purchase and inventory rather than the local five-seat
+  profile](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/3).
+- [Invitation acceptance by the recipient rather than the local
+  fixture](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/4).
+- [Employee one-time-password
+  recovery](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/5).
+- [Host-wide Clearing House retry, dead-letter and privacy-minimized
+  observability](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/6).
+- [Durable restart proof, followed by the same journeys on the local Fabric
+  network and Test Network](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/7).
 
 The local in-memory result must not be described as deployed or production
 ready until those gates have passed without skipped tests.
