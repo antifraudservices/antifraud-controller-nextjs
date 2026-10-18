@@ -5,9 +5,11 @@
 The controller portal and role portals are different applications.
 
 The controller portal administers organizations, departments, employees,
-invitations, groups and reusable group authorizations. It also renders the
-controller views of addressed Clearing House items. This does not turn host
-administration into tenant or evidence authority.
+invitations, groups and reusable group authorizations. It also owns the
+controller-authorized employee identity-evidence, age-over and employer
+qualification-evidence workflows and renders controller views of addressed
+Clearing House items. This does not turn host administration into tenant,
+issuer or unrestricted evidence authority.
 
 A host controller may operate peer discovery, queues, retries, dead letters,
 delivery receipts and unresolved protected organization references. It sees
@@ -24,14 +26,15 @@ category without bodies, evidence, tokens or unrestricted diagnostics.
 A tenant controller may list only items addressed to its verified
 organization. Subject to exact evidence-access policy, it may inspect an item,
 act under controller authority or delegate separate list, open, compare,
-propose, approve and submit capabilities to a group. Delegated employees use a
-role portal; they do not receive controller administration screens.
+propose, approve and submit capabilities to a group. An authorized controller
+or human-resources employee may record evidence about an employee through this
+neutral portal. Other delegated sector work remains in role portals; those
+users do not receive controller administration screens.
 
-The initial planned professional profile is `qualification-education`, for
-authorized education roles. Its implementation belongs to a separate
-repository and remains pending. Other sector workflows remain in their owning
-role portals, which may reuse the neutral components without moving their
-sector policy into this application.
+Other sector workflows remain in their owning role portals, which may reuse
+the neutral components without moving sector policy into this application.
+The current increment deliberately adds no Antifraud workflow to a
+veterinarian or another VetChain professional.
 
 ## Shared component boundary
 
@@ -75,7 +78,19 @@ The controller portal is complete only when an executable journey proves:
    authenticated peer-host queries over local indexes without listing Fabric
    channels; and
 10. host and tenant observability expose only their authorized pending counts,
-    delivery status, receipts and safe failures.
+    delivery status, receipts and safe failures;
+11. an authorized controller or human-resources actor records employee
+    identity evidence and age-over predicates through BFF, high-level SDK and
+    gateway without browser-supplied authority; and
+12. employer qualification evidence remains distinct from issuer confirmation
+    or a wallet credential.
 
 Unit tests, fixture Playwright, screenshots or a successful response alone do
 not satisfy this condition.
+
+The current local evidence increment proves UI to backend-for-frontend to Node
+SDK to in-memory gateway writes and returned transaction identifiers for
+identity age-over and employer qualification evidence. It does not yet satisfy
+the complete condition above because organization/workforce state is still a
+fixture and no Fabric restart/readback, Clearing House federation or Test
+Network journey has been proven.
