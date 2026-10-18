@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Publish the controller delivery gates as repository-owned GitHub issues and
+  link the parity backlog to their executable acceptance work.
 - Permit the synthetic controller authority only in local development or an
   explicitly declared staging demo, while Test Network and production remain
   fail-closed.
