@@ -22,9 +22,9 @@ All notable changes to this project are documented here.
 - Keep the browser journey focused on accessible lifecycle behavior instead of
   private component CSS class names.
 - Establish the public Antifraud-owned, sector-neutral controller application,
-  separate from the existing multisector VetChain professional portal.
+  separate from existing multisector professional portals.
 - Consume the controlled Antifraud workforce component migrated from the
-  public Apache-2.0 UHC component package with provenance retained.
+  compatible public Apache-2.0 component package with provenance retained.
 - Add the neutral identity-evidence group and exact create, update, evidence,
   verification, subject-attestation and relationship-attestation capabilities.
 - Specify active assignment plus active group membership and reusable group
