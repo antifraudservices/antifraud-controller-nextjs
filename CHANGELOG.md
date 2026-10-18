@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Pin `antifraud-sdk-node-ts@0.2.3`, including SDK Core `0.1.3` and Data Utils
+  `0.1.4`, so the BFF dependency graph exposes the released trusted DIDComm
+  document-delivery controller without a local package link.
+
 - Define Demo as the only executable MVP environment, with Test Network gated
   on owner-provided Kubernetes, Production disabled and server-owned
   collection-prefix isolation.

@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "antifraud-portal-components-react": "0.1.0",
-    "antifraud-sdk-node-ts": "0.2.2",
+    "antifraud-sdk-node-ts": "0.2.3",
     "next": "16.4.2",
     "react": "19.2.8",
     "react-dom": "19.2.8"
