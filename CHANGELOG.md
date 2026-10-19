@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Resolve the hosted Beta Controller page at request time so its server-owned Demo authorization and environment controls use App Hosting runtime configuration instead of a static build-time snapshot.
+
 - Connect the qualification editor through its authenticated BFF to the neutral
   Terminology SDK and accessible selector. The employer intent now retains the
   selected canonical system, version, optional concept URI and code across
