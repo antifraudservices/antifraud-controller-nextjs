@@ -5,6 +5,12 @@ export type PortalConfig = Readonly<{
   supportUrl: string
 }>
 
+export type PortalEnvironmentConfig = Readonly<{
+  active: 'demo' | 'test-network' | 'production'
+  testNetworkEnabled: boolean
+  productionEnabled: boolean
+}>
+
 type Environment = Readonly<Record<string, string | undefined>>
 
 const DEFAULT_CONFIG: PortalConfig = Object.freeze({
@@ -36,4 +42,22 @@ export function readPortalConfig(environment: Environment = process.env): Portal
   if (!safeSupportUrl(supportUrl)) throw new Error('Portal support URL must use HTTPS.')
 
   return Object.freeze({ name, logoUrl, accentColor, supportUrl })
+}
+
+export function readPortalEnvironment(environment: Environment = process.env): PortalEnvironmentConfig {
+  const requested = environment.ANTIFRAUD_NETWORK_KIND ?? 'demo'
+  const testNetworkEnabled = environment.ANTIFRAUD_TEST_NETWORK_ENABLED === 'true'
+  const productionEnabled = environment.ANTIFRAUD_PRODUCTION_ENABLED === 'true'
+  if (requested === 'demo' || requested === 'test') {
+    return Object.freeze({active: 'demo', testNetworkEnabled, productionEnabled})
+  }
+  if (requested === 'test-network') {
+    if (!testNetworkEnabled) throw new Error('Test Network is disabled until its Fabric runtime is provisioned.')
+    return Object.freeze({active: 'test-network', testNetworkEnabled, productionEnabled})
+  }
+  if (requested === 'network' || requested === 'production') {
+    if (!productionEnabled) throw new Error('Production is disabled.')
+    return Object.freeze({active: 'production', testNetworkEnabled, productionEnabled})
+  }
+  throw new Error(`Unsupported private portal environment: ${requested}`)
 }

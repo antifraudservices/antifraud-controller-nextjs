@@ -19,28 +19,43 @@ through the backend-for-frontend, public Node SDK and local gateway. It reuses `
 workforce component migrated from a compatible public Apache-2.0 package.
 Desktop and mobile tests exercise
 the real local UI to backend-for-frontend to Node SDK to gateway path for an
-employee age-over predicate and employer qualification evidence.
+employee age-over predicate and employer qualification evidence. The same
+journey uploads a valid minimal PDF as a DIDComm attachment beside the
+Schema.org `DigitalDocument`/`MediaObject` graph, verifies JWE-sealed Gateway
+storage by retrieving the exact bytes in the BFF, and sends only the CID into
+the qualification record. It never creates a FHIR `DocumentReference`.
+
+The qualification editor searches the neutral Terminology service only through
+the authenticated BFF and Node SDK. It persists the governed classification
+system, release version, optional concept URI and code; English and Spanish
+labels remain presentation metadata. The employer signs only its evidence
+statement. The addressed education institution remains the only authority that
+can confirm or reject the claimed issuer relationship in
+`qualification-education-<zone>`.
 
 The MVP delivery target is Demo. It uses the normal UI, BFF, public Node SDK
 and gateway contracts with the six-second in-memory Fabric adapter. Demo must
 keep the same components, options, validation and business flows designed for
 future Test Network use, while every simulated transaction and receipt remains
-visibly non-Fabric. Test Network is visible but disabled until the project
-owner supplies Kubernetes and configuration. Production is disabled.
+visibly non-Fabric. Test Network remains disabled in the hosted portal until
+the separately gated Fabric and service deployment exists; Kubernetes is not
+an application requirement. Production is disabled.
 
-The current flow covers authoritative organization binding, notifications and
-authorization readback within one gateway process. Completing all Demo
-journeys and their authoritative Demo readback remains open. Kubernetes,
-local-network Fabric and Test Network deployment are later work, not MVP gates.
+The current flow covers authoritative organization binding, notifications,
+identity and qualification evidence, the minimal PDF attachment, addressed
+professional review and authoritative readback within one gateway process.
+The hosted Demo is the current delivery gate. A separately operated Fabric
+Test Network, initially allowed to use one orderer, is later work; Kubernetes
+is optional infrastructure rather than a prerequisite.
 
 The controller also lists Clearing House references addressed to its
 authenticated organization and may confirm or reject a pending reference. The
 list contains operational envelope data only; it does not expose confidential
 evidence.
 
-The portal pins the public `antifraud-portal-components-react@0.1.0` release
-with a committed lockfile. The BFF uses the neutral Node SDK during the local
-evidence journey; its exact registry dependency is a release gate.
+The portal pins exact reviewed releases of the public component package and
+neutral Node SDK with a committed lockfile. Registry integrity and the full
+local browser journey are release gates.
 
 ## Security boundary
 

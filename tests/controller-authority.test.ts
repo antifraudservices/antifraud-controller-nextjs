@@ -27,13 +27,16 @@ describe('controller authority boundary', () => {
       .toEqual({ authenticated: false, capabilities: [] })
   })
 
-  it('enables synthetic demo evidence only in development or the explicit staging demo', () => {
+  it('enables synthetic demo evidence only in development or an explicit Beta/staging Demo', () => {
     expect(localDemoAccess({ NODE_ENV: 'production', CONTROLLER_DEPLOYMENT_STAGE: 'network', CONTROLLER_DEMO_MODE: 'true' }))
       .toEqual({ authenticated: false, capabilities: [] })
     expect(localDemoAccess({ NODE_ENV: 'development', CONTROLLER_DEMO_MODE: 'true' }).authenticated)
       .toBe(true)
     expect(localDemoAccess({
       NODE_ENV: 'production', CONTROLLER_DEPLOYMENT_STAGE: 'staging', CONTROLLER_DEMO_MODE: 'true',
+    }).authenticated).toBe(true)
+    expect(localDemoAccess({
+      NODE_ENV: 'production', CONTROLLER_DEPLOYMENT_STAGE: 'beta', CONTROLLER_DEMO_MODE: 'true',
     }).authenticated).toBe(true)
   })
 })

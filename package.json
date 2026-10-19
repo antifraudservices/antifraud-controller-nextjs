@@ -17,17 +17,24 @@
     "check": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
-    "antifraud-portal-components-react": "0.1.0",
-    "antifraud-sdk-node-ts": "0.2.3",
+    "antifraud-data-utils-ts": "0.1.9",
+    "antifraud-portal-components-react": "0.1.1",
+    "antifraud-sdk-node-ts": "0.2.5",
     "next": "16.4.2",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "terminology-components-react": "0.2.0",
+    "terminology-sdk-node-ts": "0.3.2"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
     "@types/node": "22.19.15",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
+    "jsdom": "26.1.0",
     "typescript": "5.9.3",
     "vitest": "4.1.12"
   }

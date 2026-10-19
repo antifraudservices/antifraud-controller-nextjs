@@ -8,12 +8,14 @@ describe('shared controller workspace', () => {
     const html = renderToStaticMarkup(<ControllerWorkspace
       portalName="Antifraud Controller"
       organizationName="Example Organization"
+      environment={{active: 'demo', testNetworkEnabled: false, productionEnabled: false}}
     />)
 
     expect(html).toContain('Organization information')
     expect(html).toContain('Members and devices')
     expect(html).toContain('Groups and departments')
     expect(html).toContain('Identity and qualification evidence')
+    expect(html).toContain('Demo — simulated blockchain')
     expect(html).toContain('data-reuse-source="antifraud-portal-components-react@0.1.0"')
   })
 })
