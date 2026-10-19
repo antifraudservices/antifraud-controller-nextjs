@@ -134,6 +134,15 @@ a { color: inherit; }
 .evidence-panel button:disabled { opacity: .48; }
 .evidence-receipt { padding: 12px; border-radius: 10px; background: color-mix(in srgb, var(--portal-accent) 9%, var(--afpc-surface)); display: grid; gap: 4px; }
 .evidence-receipt small { color: var(--afpc-muted); }
+.qualification-classification { display: grid; gap: 12px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--afpc-border); }
+.qualification-classification > header { display: flex; justify-content: space-between; gap: 12px; align-items: end; }
+.qualification-classification h3 { margin: 0; }
+.qualification-classification [data-terminology-code-picker-v2] { display: grid; gap: 10px; }
+.qualification-classification [data-terminology-code-picker-v2] > div { display: flex; gap: 8px; align-items: center; }
+.qualification-classification [data-terminology-code-picker-v2] input,
+.qualification-classification [data-terminology-code-picker-v2] select { width: 100%; min-height: 43px; padding: 9px 11px; border: 1px solid var(--afpc-border); border-radius: 9px; background: var(--afpc-surface); color: var(--afpc-text); }
+.qualification-classification [data-terminology-code-picker-v2] button { min-width: 43px; }
+.qualification-classification [role='status'] { display: grid; gap: 3px; margin: 0; padding: 10px; border-radius: 9px; background: color-mix(in srgb, var(--portal-accent) 9%, var(--afpc-surface)); }
 
 @media (max-width: 760px) {
   .controller-header { position: static; grid-template-columns: 1fr auto; gap: 10px; padding-inline: 14px; }

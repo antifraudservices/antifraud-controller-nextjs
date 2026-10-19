@@ -4,12 +4,21 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-- Pin `antifraud-sdk-node-ts@0.2.3`, including SDK Core `0.1.3` and Data Utils
-  `0.1.4`, so the BFF dependency graph exposes the released trusted DIDComm
-  document-delivery controller without a local package link.
+- Connect the qualification editor through its authenticated BFF to the neutral
+  Terminology SDK and accessible selector. The employer intent now retains the
+  selected canonical system, version, optional concept URI and code across
+  English/Spanish label changes before issuer verification.
+
+- Upload evidence bytes through the high-level Node SDK, verify the Gateway
+  receipt and exact authorized retrieval, and keep only the governed CID in
+  qualification evidence. The business model remains Schema.org and DIDComm
+  transports the binary; no FHIR `DocumentReference` is introduced.
+- Consume exact published SDK artifacts only after cumulative local and real
+  local-network gates pass; repository documentation does not pin a transient
+  release candidate version.
 
 - Define Demo as the only executable MVP environment, with Test Network gated
-  on owner-provided Kubernetes, Production disabled and server-owned
+  on separately deployed Fabric and service endpoints, Production disabled and server-owned
   collection-prefix isolation.
 - Publish the controller delivery gates as repository-owned GitHub issues and
   link the parity backlog to their executable acceptance work.
@@ -19,9 +28,6 @@ All notable changes to this project are documented here.
 - Document that interactive local portal acceptance targets real
   `local-network` Fabric and that staging demo persistence uses the same gateway
   contract with a six-second simulated ledger delay.
-- Pin the verified `antifraud-sdk-node-ts@0.2.2` release, including
-  `antifraud-sdk-core-ts@0.1.2` and `antifraud-data-utils-ts@0.1.3`, for the
-  explicit three-state issuer-resolution and governed document-CID contracts.
 - Replace browser-only workforce fixtures with authenticated gateway state for
   organization, licences, employees, invitations, devices, groups,
   departments, memberships, reusable authorizations and notifications.
@@ -39,8 +45,8 @@ All notable changes to this project are documented here.
   SHA3-384 instead of relying on unsupported browser Web Crypto algorithms.
 - Assert that browser evidence intents contain no actor, assignment, group
   authorization, channel, zone or smart-contract authority.
-- Pin the published `antifraud-portal-components-react@0.1.0` artifact and
-  synchronize the lockfile with its verified registry integrity.
+- Consume the published portal-components artifact and synchronize the
+  lockfile with its verified registry integrity at cumulative release time.
 - Align controller theme variables and responsive workforce selectors with the
   public component package's neutral `afpc-*` namespace.
 - Keep the browser journey focused on accessible lifecycle behavior instead of

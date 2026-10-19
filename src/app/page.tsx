@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { ControllerWorkspace } from '../components/ControllerWorkspace'
-import { readPortalConfig } from '../config/portal-config'
+import { readPortalConfig, readPortalEnvironment } from '../config/portal-config'
 import { localDemoAccess } from '../security/demo-access'
 
 function accentStyle(accentColor: string): CSSProperties {
@@ -23,10 +23,11 @@ function SignInRequired({ name, logoUrl, accentColor, supportUrl }: Readonly<{
 
 export default function HomePage() {
   const config = readPortalConfig()
+  const environment = readPortalEnvironment()
   const access = localDemoAccess()
   if (!access.authenticated) return <SignInRequired {...config}/>
 
   return <div style={accentStyle(config.accentColor)}>
-    <ControllerWorkspace portalName={config.name} organizationName="Organization" />
+    <ControllerWorkspace portalName={config.name} organizationName="Organization" environment={environment} />
   </div>
 }
