@@ -4,6 +4,8 @@ import { ControllerWorkspace } from '../components/ControllerWorkspace'
 import { readPortalConfig, readPortalEnvironment } from '../config/portal-config'
 import { localDemoAccess } from '../security/demo-access'
 
+export const dynamic = 'force-dynamic'
+
 function accentStyle(accentColor: string): CSSProperties {
   return { '--portal-accent': accentColor } as CSSProperties
 }
