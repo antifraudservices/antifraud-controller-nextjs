@@ -2,8 +2,9 @@
 
 import { useDeferredValue, useState, type FormEvent } from 'react'
 import type { WorkforceEmployee } from 'antifraud-hosting-components-react'
+import type { OrganizationGroupTemplate, OrganizationGroupTemplateOption } from '../server/organization-group-policy'
 
-export type OperationalGroupTemplate = 'identity-evidence-administration' | 'qualification-evidence-administration' | 'clearing-house-review' | 'custom'
+export type OperationalGroupTemplate = OrganizationGroupTemplate
 
 export type OperationalGroup = Readonly<{
   id: string
@@ -26,11 +27,16 @@ export type EmployeeOrganizationMembership = Readonly<{
 
 type MembershipKind = 'group' | 'department'
 
-const GROUP_TEMPLATE_LABELS: Readonly<Record<OperationalGroupTemplate, string>> = Object.freeze({
+const GROUP_TEMPLATE_LABELS: Readonly<Record<string, string>> = Object.freeze({
   'identity-evidence-administration': 'Identity evidence administration',
   'qualification-evidence-administration': 'Qualification evidence administration',
   'clearing-house-review': 'Clearing House review',
   custom: 'Custom group without capabilities',
+  'subject-registration': 'Subject registration',
+  'scheduling-operations': 'Scheduling operations',
+  'encounter-operations': 'Encounter operations',
+  'clinical-contribution': 'Clinical contribution',
+  'public-communication-request-publishing': 'Public communication requests',
 })
 
 function matchesEmployee(employee: WorkforceEmployee, query: string): boolean {
@@ -97,6 +103,7 @@ export function OrganizationStructureAdministration({
   onCreateGroup,
   onCreateDepartment,
   onMembershipChange,
+  groupTemplates,
 }: Readonly<{
   employees: readonly WorkforceEmployee[]
   groups: readonly OperationalGroup[]
@@ -105,10 +112,12 @@ export function OrganizationStructureAdministration({
   onCreateGroup(name: string, template: OperationalGroupTemplate): void
   onCreateDepartment(name: string): void
   onMembershipChange(employeeId: string, kind: MembershipKind, membershipId: string, enabled: boolean): void
+  groupTemplates?: readonly OrganizationGroupTemplateOption[]
 }>) {
   const [query, setQuery] = useState('')
   const [groupName, setGroupName] = useState('')
-  const [groupTemplate, setGroupTemplate] = useState<OperationalGroupTemplate>('identity-evidence-administration')
+  const availableGroupTemplates = groupTemplates ?? Object.entries(GROUP_TEMPLATE_LABELS).slice(0, 4).map(([value, label]) => ({ value: value as OperationalGroupTemplate, label }))
+  const [groupTemplate, setGroupTemplate] = useState<OperationalGroupTemplate>(availableGroupTemplates[0]?.value ?? 'custom')
   const [departmentName, setDepartmentName] = useState('')
   const deferredQuery = useDeferredValue(query.trim().toLocaleLowerCase())
   const visibleGroups = groups.filter(group => {
@@ -141,7 +150,7 @@ export function OrganizationStructureAdministration({
     <p className="authority-boundary">A group records reusable administrative authorization. Each operation still verifies the active employee, membership and exact capability.</p>
 
     <div className="structure-create-grid">
-      <form onSubmit={createGroup}><h3>Create an employee group</h3><label><span>Group name</span><input value={groupName} onChange={event => setGroupName(event.currentTarget.value)} required /></label><label><span>Group template</span><select value={groupTemplate} onChange={event => setGroupTemplate(event.currentTarget.value as OperationalGroupTemplate)}>{Object.entries(GROUP_TEMPLATE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><button type="submit">Create group</button></form>
+      <form onSubmit={createGroup}><h3>Create an employee group</h3><label><span>Group name</span><input value={groupName} onChange={event => setGroupName(event.currentTarget.value)} required /></label><label><span>Group template</span><select value={groupTemplate} onChange={event => setGroupTemplate(event.currentTarget.value as OperationalGroupTemplate)}>{availableGroupTemplates.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label><button type="submit">Create group</button></form>
       <form onSubmit={createDepartment}><h3>Create a department</h3><label><span>Department name</span><input value={departmentName} onChange={event => setDepartmentName(event.currentTarget.value)} required /></label><button type="submit">Create department</button></form>
     </div>
 

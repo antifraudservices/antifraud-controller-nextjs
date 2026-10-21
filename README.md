@@ -66,6 +66,16 @@ professional portal journeys. A selected label does not establish employment,
 licensure, `PractitionerRole`, consent or scheduling authority; the backend
 still requires the normal assignment, group and capability checks.
 
+Group creation uses reviewed server-side templates. The browser sends a
+template identifier, never a capability array. Administrative templates keep
+identity evidence, qualification evidence and Clearing House review separate.
+On `antifraud-tech`, additional synthetic workflow templates cover subject
+registration, scheduling, encounters, clinical contribution and public
+communication requests. The controller assigns an employee to a group; the
+employee performs the operation from the appropriate professional profile.
+The same person may use the same email for controller and employee invitations,
+but those remain separate profiles and wallets with separate authority.
+
 One deployed service can render either the organization-controller workspace
 or the separate host-controller workspace from an exact private hostname
 manifest. The host workspace lists the protected organization registry and

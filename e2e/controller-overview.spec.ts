@@ -105,6 +105,8 @@ test('reuses the proven controller home and shared workforce administration', as
 
   await page.getByRole('button', { name: 'Groups and departments', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Groups and departments' })).toBeVisible()
+  await expect(page.getByLabel('Group template').locator('option[value="subject-registration"]')).toHaveCount(1)
+  await expect(page.getByLabel('Group template').locator('option[value="scheduling-operations"]')).toHaveCount(1)
   const clientManagers = page.getByRole('article', { name: 'Client group managers' })
   await expect(clientManagers.getByText('service.manager@example.invalid')).toBeVisible()
   const evidenceAssistants = page.getByRole('article', { name: 'Identity evidence assistants' })
@@ -229,5 +231,8 @@ test('reuses the proven controller home and shared workforce administration', as
   for (const intent of controllerIntents) {
     expect(intent).not.toMatch(/"actor"|"organizationReference"|"assignmentReference"|"groupAuthorization"|"channel"|"zone"|"smartContract"/u)
   }
+  const groupIntent = controllerIntents.find(intent => intent.includes('create-group'))
+  expect(groupIntent).toContain('"template":"custom"')
+  expect(groupIntent).not.toContain('"capabilities"')
   expect(errors).toEqual([])
 })

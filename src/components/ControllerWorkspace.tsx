@@ -8,6 +8,7 @@ import { EvidenceAdministration } from './EvidenceAdministration'
 import { ClearingHouseAdministration } from './ClearingHouseAdministration'
 import type { PortalModule } from '../config/portal-config'
 import type { EmployeeRoleOption } from '../server/professional-role-policy'
+import type { OrganizationGroupTemplateOption } from '../server/organization-group-policy'
 
 type WorkspaceView = 'home' | 'organization' | 'members' | 'structure' | 'evidence' | 'clearing-house'
 
@@ -22,13 +23,6 @@ const workspaceCards: readonly Readonly<{ view: WorkspaceView; module: PortalMod
   { view: 'evidence', module: 'evidence', title: 'Identity and qualification evidence', description: 'Record employee identity checks, age-over predicates and qualification evidence.' },
   { view: 'clearing-house', module: 'clearing-house', title: 'Clearing House', description: 'Review evidence references addressed to this organization and record a decision.' },
 ])
-
-const GROUP_CAPABILITIES: Readonly<Record<OperationalGroupTemplate, readonly string[]>> = Object.freeze({
-  'identity-evidence-administration': Object.freeze(['identity.subject.create', 'identity.subject.update', 'identity.evidence.record', 'identity.claim.verify', 'identity.subject.attest', 'identity.relationship.attest']),
-  'qualification-evidence-administration': Object.freeze(['qualification-evidence:create']),
-  'clearing-house-review': Object.freeze(['qualification-inbox:list', 'qualification-evidence:decide']),
-  custom: Object.freeze([]),
-})
 
 async function readWorkspace(): Promise<ControllerWorkspaceState> {
   const response = await fetch('/api/controller/workspace', { cache: 'no-store' })
@@ -55,11 +49,12 @@ function InvitationAssignments({ groups, departments, groupReferences, departmen
   return <section className="membership-directory" aria-labelledby="invitation-assignments-title"><header><div><h2 id="invitation-assignments-title">Initial invitation assignments</h2><p>Optionally choose the groups and departments proposed in the next invitation.</p></div></header><div className="membership-options"><fieldset><legend>Groups</legend>{groups.map(group => <label key={group.id}><input type="checkbox" checked={groupReferences.includes(group.id)} onChange={event => onGroupsChange(changeSet(groupReferences, group.id, event.currentTarget.checked))}/><span>{group.name}</span></label>)}</fieldset><fieldset><legend>Departments</legend>{departments.map(department => <label key={department.id}><input type="checkbox" checked={departmentReferences.includes(department.id)} onChange={event => onDepartmentsChange(changeSet(departmentReferences, department.id, event.currentTarget.checked))}/><span>{department.name}</span></label>)}</fieldset></div></section>
 }
 
-export function ControllerWorkspace({ portalName, organizationName, modules, employeeRoles }: Readonly<{
+export function ControllerWorkspace({ portalName, organizationName, modules, employeeRoles, groupTemplates }: Readonly<{
   portalName: string
   organizationName: string
   modules?: readonly PortalModule[]
   employeeRoles?: readonly EmployeeRoleOption[]
+  groupTemplates?: readonly OrganizationGroupTemplateOption[]
 }>) {
   const [view, setView] = useState<WorkspaceView>('home')
   const [workspace, setWorkspace] = useState<ControllerWorkspaceState>()
@@ -94,7 +89,7 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
     const current = memberships.find(item => item.employeeId === employeeId) ?? { employeeId, groupIds: [], departmentIds: [] }
     void mutate({ type: 'set-memberships', employeeReference: employeeId, groupReferences: kind === 'group' ? changeSet(current.groupIds, membershipId, enabled) : current.groupIds, departmentReferences: kind === 'department' ? changeSet(current.departmentIds, membershipId, enabled) : current.departmentIds })
   }
-  function createGroup(name: string, template: OperationalGroupTemplate): void { void mutate({ type: 'create-group', name, capabilities: GROUP_CAPABILITIES[template] }) }
+  function createGroup(name: string, template: OperationalGroupTemplate): void { void mutate({ type: 'create-group', name, template }) }
   function createDepartment(name: string): void { void mutate({ type: 'create-department', name }) }
 
   const displayedOrganization = workspace?.organization.displayName || organizationName
@@ -111,7 +106,7 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
         <button type="button" className="workspace-back" onClick={() => open('home')}>← Back to controller home</button>
         {view === 'members' ? <div className="shared-workforce-wrapper"><section className="current-controller-summary" aria-label="Current controller"><span><strong>Authenticated controller</strong><small>Protected controller reservation</small></span><span>Managed by trusted backend state</span></section><InvitationAssignments groups={groups} departments={departments} groupReferences={inviteGroupReferences} departmentReferences={inviteDepartmentReferences} onGroupsChange={setInviteGroupReferences} onDepartmentsChange={setInviteDepartmentReferences}/><OrganizationWorkforceAdministration copy={WORKFORCE_COPY} summary={workspace ? { total: workspace.licences.total, used: workspace.licences.assigned, free: workspace.licences.free } : { total: 0, used: 0, free: 0 }} employees={employees} invitations={invitations} roles={roleOptions} email={email} role={role} unlockSecret={unlockSecret} onEmailChange={setEmail} onRoleChange={setRole} onUnlockSecretChange={setUnlockSecret} onInvite={invite} onDisable={id => { void mutate({ type: 'set-status', employeeReference: id, status: 'inactive' }) }} onReactivate={id => { void mutate({ type: 'set-status', employeeReference: id, status: 'active' }) }} onPurge={id => { void mutate({ type: 'purge-employee', employeeReference: id }) }} /><EmployeeMembershipDirectory employees={employees} groups={groups} departments={departments} memberships={memberships} onMembershipChange={changeMembership} /></div> : null}
         {view === 'organization' ? <InformationalPanel title="Organization information"><p>This state is read from the authenticated gateway organization.</p><dl className="controller-facts"><div><dt>Organization</dt><dd>{displayedOrganization}</dd></div><div><dt>Reference</dt><dd>{workspace?.organization.reference ?? 'Loading…'}</dd></div><div><dt>Employees</dt><dd>{employees.length}</dd></div><div><dt>Notifications</dt><dd>{workspace?.notifications.length ?? 0}</dd></div></dl></InformationalPanel> : null}
-        {view === 'structure' ? <OrganizationStructureAdministration employees={employees} groups={groups} departments={departments} memberships={memberships} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
+        {view === 'structure' ? <OrganizationStructureAdministration employees={employees} groups={groups} departments={departments} memberships={memberships} groupTemplates={groupTemplates} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
         {view === 'evidence' ? <EvidenceAdministration employees={workspace?.employees ?? []} /> : null}
         {view === 'clearing-house' ? <ClearingHouseAdministration /> : null}
       </>}
@@ -123,6 +118,11 @@ function templateFor(capabilities: readonly string[]): OperationalGroupTemplate 
   if (capabilities.includes('identity.evidence.record')) return 'identity-evidence-administration'
   if (capabilities.includes('qualification-evidence:create')) return 'qualification-evidence-administration'
   if (capabilities.includes('qualification-inbox:list')) return 'clearing-house-review'
+  if (capabilities.some(capability => capability.startsWith('organization/Subject.c?organization=Organization/'))) return 'subject-registration'
+  if (capabilities.includes('organization/Schedule.cruds')) return 'scheduling-operations'
+  if (capabilities.includes('organization/Encounter.cruds')) return 'encounter-operations'
+  if (capabilities.includes('Subject/Composition.cuds')) return 'clinical-contribution'
+  if (capabilities.includes('organization/CommunicationRequest.c')) return 'public-communication-request-publishing'
   return 'custom'
 }
 

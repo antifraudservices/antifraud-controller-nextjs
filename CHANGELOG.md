@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 - Resolve synthetic professional test roles from the trusted hostname sector
   profile and reject invitation roles outside that server-owned catalog.
+- Replace browser-authored group capability arrays with reviewed backend group
+  templates, including the canonical synthetic Test Network workflow groups.
 
 - Restore the shared Demo, Test Network and Production entry screen before
   authentication, and move host directory/workforce rendering to the dedicated
