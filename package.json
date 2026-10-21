@@ -26,6 +26,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sos-sdk-node-ts": "0.1.13",
+    "sos-data-utils-ts": "0.6.15",
     "terminology-components-react": "0.2.0",
     "terminology-sdk-node-ts": "0.3.2"
   },

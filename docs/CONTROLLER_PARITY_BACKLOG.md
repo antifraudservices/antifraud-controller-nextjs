@@ -6,6 +6,8 @@ Implemented and executable locally:
 - gateway-owned employee, invitation, licence and device state;
 - authoritative employee suspend, reactivate and inactive-only purge;
 - persisted group and department creation and employee memberships;
+- a trusted `antifraud-tech` hostname role catalog for synthetic cross-sector
+  professional portal testing, with backend rejection of caller-invented roles;
 - reusable group authorization with exact capabilities;
 - Communication notification references for invitation, acceptance,
   membership and lifecycle changes;

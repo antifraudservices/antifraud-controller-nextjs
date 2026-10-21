@@ -48,6 +48,16 @@ export default defineConfig({
         ANTIFRAUD_GATEWAY_BEARER: 'local-controller-bff-token',
         TERMINOLOGY_BASE_URL: 'http://127.0.0.1:3720',
         TERMINOLOGY_SERVICE_TOKEN: 'local-terminology-bff-token',
+        CONTROLLER_PORTAL_HOST_PROFILES_JSON: JSON.stringify({
+          '127.0.0.1': {
+            id: 'local-antifraud-tech', kind: 'organization-controller',
+            name: 'Antifraud Controller', logoUrl: '/brand/controller-mark.svg', accentColor: '#075f68',
+            supportUrl: 'https://github.com/antifraudservices/antifraud-controller-nextjs',
+            modules: ['organization', 'workforce', 'structure', 'evidence', 'clearing-house'],
+            allowedSectors: ['antifraud-tech'], allowedJurisdictions: ['CA-BC'],
+            enrollmentPolicy: 'jurisdiction-provider',
+          },
+        }),
       },
       url: 'http://127.0.0.1:3600',
       reuseExistingServer: false,

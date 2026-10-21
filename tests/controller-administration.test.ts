@@ -18,4 +18,12 @@ describe('controller administration BFF', () => {
       type: 'create-department', name: 'Injected', organizationReference: 'organization:other',
     } as never)).rejects.toThrow(/organization authority/i)
   })
+
+  it('rejects a browser-selected role outside trusted hostname policy', async () => {
+    const client = { createControllerInvitation: vi.fn(), readControllerWorkspace: vi.fn() }
+    await expect(executeControllerAction(client as never, {
+      type: 'create-invitation', email: 'person@example.invalid', role: 'doctor', groupReferences: [], departmentReferences: [],
+    }, { allowedEmployeeRoles: ['organization-manager'] })).rejects.toThrow('employee_role_not_allowed')
+    expect(client.createControllerInvitation).not.toHaveBeenCalled()
+  })
 })

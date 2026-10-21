@@ -19,14 +19,18 @@ type ControllerClient = Pick<AntifraudGatewayClient,
   | 'setControllerEmployeeMemberships'
   | 'purgeControllerEmployee'>
 
-export async function executeControllerAction(client: ControllerClient, action: ControllerAction): Promise<ControllerWorkspace> {
+export async function executeControllerAction(client: ControllerClient, action: ControllerAction, policy: Readonly<{ allowedEmployeeRoles?: readonly string[] }> = {}): Promise<ControllerWorkspace> {
   if (Object.hasOwn(action, 'organizationReference')) throw new Error('Browser-owned organization authority is not accepted.')
   switch (action.type) {
     case 'create-department': await client.createControllerDepartment({ name: action.name }); break
     case 'create-group': await client.createControllerGroup({ name: action.name, capabilities: action.capabilities }); break
-    case 'create-invitation': await client.createControllerInvitation({
+    case 'create-invitation': {
+      const allowed = policy.allowedEmployeeRoles ?? ['organization-manager', 'evidence-reviewer', 'audit-viewer']
+      if (!allowed.includes(action.role)) throw new Error('employee_role_not_allowed')
+      await client.createControllerInvitation({
       email: action.email, role: action.role, groupReferences: action.groupReferences, departmentReferences: action.departmentReferences,
-    }); break
+      }); break
+    }
     case 'accept-invitation': await client.acceptControllerInvitation(action.invitationReference, { deviceReference: action.deviceReference }); break
     case 'set-status': await client.setControllerEmployeeStatus(action.employeeReference, action.status); break
     case 'set-memberships': await client.setControllerEmployeeMemberships(action.employeeReference, {

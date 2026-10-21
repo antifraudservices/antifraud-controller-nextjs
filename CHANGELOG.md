@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Resolve synthetic professional test roles from the trusted hostname sector
+  profile and reject invitation roles outside that server-owned catalog.
+
 - Restore the shared Demo, Test Network and Production entry screen before
   authentication, and move host directory/workforce rendering to the dedicated
   hosting component package without changing the controller BFF authority.

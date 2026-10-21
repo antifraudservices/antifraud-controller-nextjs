@@ -59,6 +59,13 @@ The portal pins exact reviewed releases of the public component package and
 neutral Node SDK with a committed lockfile. Registry integrity and the full
 local browser journey are release gates.
 
+For a hostname whose trusted profile enables `antifraud-tech`, the workforce
+invitation screen also offers the canonical synthetic professional personas
+published by SOS data utilities. They exist only to exercise personal and
+professional portal journeys. A selected label does not establish employment,
+licensure, `PractitionerRole`, consent or scheduling authority; the backend
+still requires the normal assignment, group and capability checks.
+
 One deployed service can render either the organization-controller workspace
 or the separate host-controller workspace from an exact private hostname
 manifest. The host workspace lists the protected organization registry and
