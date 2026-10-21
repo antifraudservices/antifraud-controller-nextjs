@@ -10,16 +10,10 @@ env:
     value: beta
     availability: [RUNTIME]
   - variable: ANTIFRAUD_GATEWAY_BASE_URL
-    value: https://antifraud-gw-beta-982931712028.us-central1.run.app
+    value: https://antifraud-gw-temp-788157665132.us-central1.run.app
     availability: [RUNTIME]
   - variable: ANTIFRAUD_GATEWAY_BEARER
-    secret: antifraud-demo-controller-bff-token
-    availability: [RUNTIME]
-  - variable: TERMINOLOGY_BASE_URL
-    value: https://antifraud-terminology-beta-982931712028.us-central1.run.app
-    availability: [RUNTIME]
-  - variable: TERMINOLOGY_SERVICE_TOKEN
-    secret: antifraud-demo-terminology-token
+    secret: antifraud-controller-bff-token-temp
     availability: [RUNTIME]
   - variable: CONTROLLER_DEMO_MODE
     value: "true"
