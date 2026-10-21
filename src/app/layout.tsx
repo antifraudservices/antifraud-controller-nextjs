@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import type { CSSProperties, ReactNode } from 'react'
 import { resolvePortalDeployment } from '../config/portal-config'
+import 'antifraud-common-components-react/styles.css'
+import 'antifraud-hosting-components-react/styles.css'
 import 'antifraud-portal-components-react/styles.css'
 import './styles.css'
 

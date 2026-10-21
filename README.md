@@ -15,8 +15,10 @@ evidence, age-over predicates and employer-reviewed qualification evidence.
 ## Current state
 
 The local application reads and mutates organization and workforce state
-through the backend-for-frontend, public Node SDK and local gateway. It reuses `antifraud-portal-components-react`, including a
-workforce component migrated from a compatible public Apache-2.0 package.
+through the backend-for-frontend, public Node SDK and local gateway. It reuses
+`antifraud-common-components-react` for entry, sign-in and evidence,
+`antifraud-hosting-components-react` for host/organization administration and
+`antifraud-portal-components-react` only for qualification-professional UI.
 Desktop and mobile tests exercise
 the real local UI to backend-for-frontend to Node SDK to gateway path for an
 employee age-over predicate and employer qualification evidence. The same
@@ -144,7 +146,12 @@ npm run test:e2e
 
 ## Repository boundaries
 
-- `antifraud-portal-components-react` owns controlled reusable UI.
+- `antifraud-common-components-react` owns domain-neutral entry,
+  authentication, profile protection and evidence controls.
+- `antifraud-hosting-components-react` owns host and organization-controller
+  administration screens.
+- `antifraud-portal-components-react` owns education and qualification
+  professional screens.
 - This repository owns controller navigation, host state and BFF calls,
   plus controller-authorized employee identity, age-over and employer
   qualification-evidence workflows.

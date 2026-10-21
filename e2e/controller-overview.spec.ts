@@ -26,7 +26,8 @@ test('reuses the proven controller home and shared workforce administration', as
   })
 
   await page.goto('/')
-  await expect(page.getByText('Demo — simulated blockchain')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Choose an environment' })).toBeVisible()
+  await page.getByRole('link', { name: /Demo — simulated blockchain/u }).click()
   await expect(page).toHaveTitle(/Antifraud Controller/u)
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible()
   await expect(page.getByText('Authenticated controller workspace')).toBeVisible()

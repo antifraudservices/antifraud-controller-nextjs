@@ -2,10 +2,9 @@
 
 import { useState } from 'react'
 import type { QualificationClassificationReference } from 'antifraud-data-utils-ts'
+import { IdentityEvidenceEditor, type IdentityEvidenceEditorSubmission } from 'antifraud-common-components-react'
 import {
-  IdentityEvidenceEditor,
   QualificationEvidenceEditor,
-  type IdentityEvidenceEditorSubmission,
   type QualificationEvidenceDelivery,
   type QualificationEvidenceIssuerResolution,
   type QualificationEvidenceSubmission,

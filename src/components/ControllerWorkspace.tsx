@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ControllerWorkspace as ControllerWorkspaceState } from 'antifraud-sdk-node-ts'
-import { EnvironmentSelector, OrganizationWorkforceAdministration, type OrganizationWorkforceCopy, type PortalEnvironment, type WorkforceEmployee, type WorkforceInvitation } from 'antifraud-portal-components-react'
+import { OrganizationWorkforceAdministration, type OrganizationWorkforceCopy, type WorkforceEmployee, type WorkforceInvitation } from 'antifraud-hosting-components-react'
 import { EmployeeMembershipDirectory, OrganizationStructureAdministration, type EmployeeOrganizationMembership, type OperationalGroup, type OperationalGroupTemplate, type OrganizationDepartment } from './OrganizationStructureAdministration'
 import { EvidenceAdministration } from './EvidenceAdministration'
 import { ClearingHouseAdministration } from './ClearingHouseAdministration'
@@ -54,10 +54,9 @@ function InvitationAssignments({ groups, departments, groupReferences, departmen
   return <section className="membership-directory" aria-labelledby="invitation-assignments-title"><header><div><h2 id="invitation-assignments-title">Initial invitation assignments</h2><p>Optionally choose the groups and departments proposed in the next invitation.</p></div></header><div className="membership-options"><fieldset><legend>Groups</legend>{groups.map(group => <label key={group.id}><input type="checkbox" checked={groupReferences.includes(group.id)} onChange={event => onGroupsChange(changeSet(groupReferences, group.id, event.currentTarget.checked))}/><span>{group.name}</span></label>)}</fieldset><fieldset><legend>Departments</legend>{departments.map(department => <label key={department.id}><input type="checkbox" checked={departmentReferences.includes(department.id)} onChange={event => onDepartmentsChange(changeSet(departmentReferences, department.id, event.currentTarget.checked))}/><span>{department.name}</span></label>)}</fieldset></div></section>
 }
 
-export function ControllerWorkspace({ portalName, organizationName, environment, modules }: Readonly<{
+export function ControllerWorkspace({ portalName, organizationName, modules }: Readonly<{
   portalName: string
   organizationName: string
-  environment: Readonly<{active: PortalEnvironment; testNetworkEnabled: boolean; productionEnabled: boolean}>
   modules?: readonly PortalModule[]
 }>) {
   const [view, setView] = useState<WorkspaceView>('home')
@@ -99,11 +98,10 @@ export function ControllerWorkspace({ portalName, organizationName, environment,
   const displayedOrganization = workspace?.organization.displayName || organizationName
   const enabledModules = modules ?? workspaceCards.map(item => item.module)
   const enabledCards = workspaceCards.filter(card => enabledModules.includes(card.module))
-  return <div className="controller-workspace" data-reuse-source="antifraud-portal-components-react@0.1.0">
+  return <div className="controller-workspace" data-reuse-source="antifraud-hosting-components-react@1">
     <header className="controller-header"><button type="button" className="controller-brand" onClick={() => open('home')} aria-label={`${portalName} home`}><span className="controller-mark" aria-hidden="true">◇</span><span><strong>{portalName}</strong><small>Organization controller</small></span></button><div className="controller-context"><small>Active organization</small><strong>{displayedOrganization}</strong></div><button type="button" className="controller-account">Controller session</button></header>
     <nav className="controller-nav" aria-label="Controller workspace"><button type="button" aria-current={view === 'home' ? 'page' : undefined} onClick={() => open('home')}>Home</button>{enabledCards.map(card => <button type="button" key={card.view} aria-current={view === card.view ? 'page' : undefined} onClick={() => open(card.view)}>{card.title}</button>)}</nav>
     <main className="controller-main">
-      <EnvironmentSelector value={environment.active} onChange={() => undefined} testNetworkEnabled={environment.testNetworkEnabled} productionEnabled={environment.productionEnabled}/>
       <div className="controller-demo-note" role="status"><strong>Authenticated controller workspace</strong><span>{busy ? 'Saving authoritative state…' : 'Organization authority is resolved by the backend and every mutation is reloaded from the gateway.'}</span></div>
       {error ? <p role="alert">{error}</p> : null}
       {view === 'home' ? <><section className="controller-welcome"><span>Organization controller</span><h1>{displayedOrganization}</h1><p>Choose an administrative workspace.</p></section><section className="controller-card-grid" aria-label="Controller capabilities">{enabledCards.map(card => <button type="button" className="controller-card" key={card.view} onClick={() => open(card.view)}><span aria-hidden="true">→</span><strong>{card.title}</strong><small>{card.description}</small></button>)}</section></> : <>

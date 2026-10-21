@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Restore the shared Demo, Test Network and Production entry screen before
+  authentication, and move host directory/workforce rendering to the dedicated
+  hosting component package without changing the controller BFF authority.
+
 - Resolve the hosted Beta Controller page at request time so its server-owned Demo authorization and environment controls use App Hosting runtime configuration instead of a static build-time snapshot.
 
 - Connect the qualification editor through its authenticated BFF to the neutral

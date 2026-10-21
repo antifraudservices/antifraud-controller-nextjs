@@ -1,7 +1,7 @@
 'use client'
 
 import { useDeferredValue, useState, type FormEvent } from 'react'
-import type { WorkforceEmployee } from 'antifraud-portal-components-react'
+import type { WorkforceEmployee } from 'antifraud-hosting-components-react'
 
 export type OperationalGroupTemplate = 'identity-evidence-administration' | 'qualification-evidence-administration' | 'clearing-house-review' | 'custom'
 

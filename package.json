@@ -17,7 +17,9 @@
     "check": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
+    "antifraud-common-components-react": "1.0.0",
     "antifraud-data-utils-ts": "0.1.9",
+    "antifraud-hosting-components-react": "1.0.1",
     "antifraud-portal-components-react": "0.1.1",
     "antifraud-sdk-node-ts": "0.2.5",
     "next": "16.4.2",

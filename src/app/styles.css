@@ -18,6 +18,7 @@ a { color: inherit; }
 .gate-panel button { width: 100%; min-height: 46px; margin: 18px 0; border: 0; border-radius: 9px; color: #fff; background: #8090a6; }
 .gate-panel > a { color: var(--portal-accent); font-weight: 700; }
 
+
 .controller-workspace {
   --afpc-action-start: var(--portal-accent);
   --afpc-action-end: color-mix(in srgb, var(--portal-accent) 70%, #174da4);
