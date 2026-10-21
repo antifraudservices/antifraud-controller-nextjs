@@ -15,6 +15,12 @@ env:
   - variable: ANTIFRAUD_GATEWAY_BEARER
     secret: antifraud-controller-bff-token-temp
     availability: [RUNTIME]
+  - variable: TERMINOLOGY_BASE_URL
+    value: https://antifraud-terminology-temp-788157665132.us-central1.run.app
+    availability: [RUNTIME]
+  - variable: TERMINOLOGY_SERVICE_TOKEN
+    secret: antifraud-terminology-token-temp
+    availability: [RUNTIME]
   - variable: CONTROLLER_DEMO_MODE
     value: "true"
     availability: [RUNTIME]
