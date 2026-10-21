@@ -21,6 +21,9 @@ env:
   - variable: CONTROLLER_DEPLOYMENT_STAGE
     value: beta
     availability: [RUNTIME]
+  - variable: CONTROLLER_PORTAL_HOST_PROFILES_JSON
+    value: '{"antifraud-controller-temp--connectech-es-shared-test.us-central1.hosted.app":{"id":"connectech-antifraud-tech","kind":"organization-controller","name":"Antifraud Controller","logoUrl":"/brand/controller-mark.svg","accentColor":"#075f68","supportUrl":"https://github.com/antifraudservices/antifraud-controller-nextjs","modules":["organization","workforce","structure","evidence","clearing-house"],"allowedSectors":["antifraud-tech"],"allowedJurisdictions":["ES"],"enrollmentPolicy":"jurisdiction-provider"}}'
+    availability: [RUNTIME]
   - variable: ANTIFRAUD_NETWORK_KIND
     value: demo
     availability: [BUILD, RUNTIME]
