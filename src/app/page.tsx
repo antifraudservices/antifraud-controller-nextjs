@@ -2,8 +2,10 @@ import Image from 'next/image'
 import { headers } from 'next/headers'
 import type { CSSProperties } from 'react'
 import { ControllerWorkspace } from '../components/ControllerWorkspace'
+import { HostOrganizationAdministration } from '../components/HostOrganizationAdministration'
 import { readPortalEnvironment, resolvePortalDeployment } from '../config/portal-config'
 import { localDemoAccess } from '../security/demo-access'
+import { resolveHostOperatorAccess } from '../security/host-operator-authority'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,6 +31,11 @@ export default async function HomePage() {
   const config = resolvePortalDeployment(requestHeaders.get('host') || 'localhost')
   const environment = readPortalEnvironment()
   const access = localDemoAccess()
+  if (config.kind === 'host-controller') {
+    const hostAccess = resolveHostOperatorAccess()
+    if (!hostAccess.authenticated) return <SignInRequired {...config}/>
+    return <div style={accentStyle(config.accentColor)}><HostOrganizationAdministration portalName={config.name} allowedSectors={config.allowedSectors}/></div>
+  }
   if (!access.authenticated) return <SignInRequired {...config}/>
 
   return <div style={accentStyle(config.accentColor)}>

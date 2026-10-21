@@ -83,6 +83,21 @@ a { color: inherit; }
 .controller-facts div { padding: 16px; border: 1px solid var(--afpc-border); border-radius: 14px; background: var(--afpc-surface); }
 .controller-facts dt { color: var(--afpc-muted); font-size: 12px; font-weight: 800; text-transform: uppercase; }
 .controller-facts dd { margin: 6px 0 0; font-weight: 800; }
+.host-directory > header { display: flex; justify-content: space-between; gap: 20px; align-items: start; }
+.host-directory h1 { margin: 0; font-size: clamp(28px, 4vw, 42px); }
+.host-directory header p { color: var(--afpc-muted); }
+.host-directory-filters { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; margin: 24px 0; align-items: end; }
+.host-directory-filters label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; }
+.host-directory-filters input, .host-directory-filters select { min-height: 43px; padding: 9px 11px; border: 1px solid var(--afpc-border); border-radius: 9px; color: var(--afpc-text); background: var(--afpc-surface); }
+.host-directory-filters button, .host-lifecycle-actions button { min-height: 43px; padding: 9px 13px; border: 1px solid var(--afpc-border); border-radius: 9px; color: #fff; background: var(--portal-accent); font-weight: 800; }
+.host-directory-list { display: grid; gap: 12px; margin-bottom: 18px; }
+.host-directory-list article { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 18px; align-items: center; padding: 17px; border: 1px solid var(--afpc-border); border-radius: 15px; background: var(--afpc-surface); }
+.host-directory-list h2 { margin: 0; font-size: 18px; }
+.host-directory-list p { margin: 5px 0; }
+.host-directory-list small { color: var(--afpc-muted); }
+.host-directory-list > article > span { padding: 6px 9px; border-radius: 999px; color: var(--portal-accent); background: color-mix(in srgb, var(--portal-accent) 10%, var(--afpc-panel)); font-size: 12px; font-weight: 850; text-transform: capitalize; }
+.host-lifecycle-actions { display: flex; gap: 7px; }
+.host-lifecycle-actions button:disabled { color: var(--afpc-muted); background: var(--afpc-panel); opacity: .75; }
 
 .membership-directory, .organization-structure { margin-top: 22px; padding: clamp(20px, 3vw, 32px); border: 1px solid var(--afpc-border); border-radius: 22px; background: var(--afpc-panel); }
 .membership-directory > header, .structure-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 360px); align-items: end; gap: 22px; }
@@ -158,7 +173,9 @@ a { color: inherit; }
   .controller-card { min-height: 132px; padding: 20px; }
   .controller-facts { grid-template-columns: 1fr; }
   .current-controller-summary { align-items: flex-start; flex-direction: column; }
-  .membership-directory > header, .structure-heading, .membership-options, .structure-create-grid, .structure-card-grid, .evidence-grid { grid-template-columns: 1fr; }
+  .membership-directory > header, .structure-heading, .membership-options, .structure-create-grid, .structure-card-grid, .evidence-grid, .host-directory-filters, .host-directory-list article { grid-template-columns: 1fr; }
+  .host-directory > header { display: grid; }
+  .host-lifecycle-actions { flex-wrap: wrap; }
   .employee-membership > summary { align-items: flex-start; }
   .gate-panel { padding: 26px; }
 }

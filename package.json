@@ -23,6 +23,7 @@
     "next": "16.4.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sos-sdk-node-ts": "0.1.13",
     "terminology-components-react": "0.2.0",
     "terminology-sdk-node-ts": "0.3.2"
   },

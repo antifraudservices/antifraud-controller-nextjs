@@ -15,13 +15,13 @@ Implemented and executable locally:
 - employee identity and age-over evidence; and
 - employer qualification evidence with PDF, PNG, JPEG or TIFF content hashed
   by the backend as CIDv1 raw with SHA3-384 before the gateway write.
+- protected host-registry `Organization/_search` with DIDComm, paginated
+  Bundle readback and `OperationOutcome` entries, plus the separate host-only
+  organization directory and status/suspend/reactivate/purge controls. The
+  organization-controller session does not gain host authority.
 
 Deployment gates still open:
 
-- Protected host-registry `Organization/_search` with DIDComm, paginated
-  Bundle readback and `OperationOutcome` entries, followed by the host-only
-  organization directory and status/suspend/reactivate/purge controls. The
-  existing organization-controller session must not gain host authority.
 - Shared-service hostname profiles for the remaining personal, professional
   and host screens, with exact ingress hostname allowlisting and independently
   verified authority for each portal family. The controller profile resolver

@@ -57,6 +57,14 @@ The portal pins exact reviewed releases of the public component package and
 neutral Node SDK with a committed lockfile. Registry integrity and the full
 local browser journey are release gates.
 
+One deployed service can render either the organization-controller workspace
+or the separate host-controller workspace from an exact private hostname
+manifest. The host workspace lists the protected organization registry and
+performs status, suspend, reactivate and eligible inactive purge operations
+through the trusted BFF and `sos-sdk-node-ts`. The browser never selects the
+gateway host, jurisdiction, network or operator credential. See
+[the multi-domain portal architecture](docs/MULTI_DOMAIN_PORTAL_ARCHITECTURE.md).
+
 ## Security boundary
 
 Browser state never grants authority. A trusted server must resolve and verify:
