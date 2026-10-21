@@ -53,8 +53,9 @@ is the protected host registry search:
 POST /host/cds-<jurisdiction>/v1/<network>/registry/org.schema/Organization/_search
 ```
 
-The request and response are DIDComm protected. The inner response is a
-paginated `Bundle`. Each successful entry is a privacy-minimized
+The request and response are wrapped in DIDComm and sent by the trusted BFF
+over the gateway's protected transport. The inner response is a paginated
+`Bundle`. Each successful entry is a privacy-minimized
 `Organization` projection using `org.schema` claims. Entry failures are
 `OperationOutcome` results under the normal Bundle response contract.
 
