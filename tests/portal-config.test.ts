@@ -1,6 +1,6 @@
 // Flow contract: portal branding changes presentation only and cannot configure tenant identity, authority, subject scope or credentials.
 import { describe, expect, it } from 'vitest'
-import { readPortalConfig, readPortalEnvironment } from '../src/config/portal-config'
+import { readPortalConfig, readPortalEnvironment, resolvePortalDeployment } from '../src/config/portal-config'
 
 describe('portal presentation configuration', () => {
   it('normalizes a neutral deployment brand', () => {
@@ -48,5 +48,93 @@ describe('server-owned portal environment', () => {
       ANTIFRAUD_NETWORK_KIND: 'network',
       ANTIFRAUD_PRODUCTION_ENABLED: 'false',
     })).toThrow(/Production is disabled/u)
+  })
+})
+
+describe('server-owned hostname deployment manifest', () => {
+  const profiles = JSON.stringify({
+    'controller-st.connecthealth.info': {
+      id: 'neutral-controller',
+      kind: 'organization-controller',
+      name: 'Organization Controller',
+      logoUrl: '/brand/controller-mark.svg',
+      accentColor: '#075f68',
+      supportUrl: 'https://support.connecthealth.info/controller',
+      modules: ['organization', 'workforce', 'evidence'],
+      allowedSectors: ['health-care', 'animal-care', 'education'],
+      allowedJurisdictions: ['ES', 'CA', 'US'],
+      enrollmentPolicy: 'jurisdiction-provider',
+    },
+    'host-st.connecthealth.info': {
+      id: 'neutral-host',
+      kind: 'host-controller',
+      name: 'Federation Host',
+      logoUrl: '/brand/controller-mark.svg',
+      accentColor: '#123456',
+      supportUrl: 'https://support.connecthealth.info/host',
+      modules: ['host-organizations', 'host-observability'],
+      allowedSectors: ['health-care', 'animal-care', 'education'],
+      allowedJurisdictions: ['ES', 'CA', 'US'],
+      enrollmentPolicy: 'jurisdiction-provider',
+    },
+  })
+
+  it('resolves an exact request hostname through a private allowlisted manifest', () => {
+    expect(resolvePortalDeployment('controller-st.connecthealth.info:443', {
+      CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
+    })).toMatchObject({
+      hostname: 'controller-st.connecthealth.info',
+      id: 'neutral-controller',
+      kind: 'organization-controller',
+      modules: ['organization', 'workforce', 'evidence'],
+      allowedSectors: ['health-care', 'animal-care', 'education'],
+    })
+  })
+
+  it('keeps host authority separate even when the same service binary renders both portals', () => {
+    expect(resolvePortalDeployment('host-st.connecthealth.info', {
+      CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
+    })).toMatchObject({
+      kind: 'host-controller',
+      modules: ['host-organizations', 'host-observability'],
+    })
+  })
+
+  it('fails closed for an unknown or suffix-spoofed hostname when a manifest is configured', () => {
+    expect(() => resolvePortalDeployment('controller-st.connecthealth.info.attacker.invalid', {
+      CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
+    })).toThrow(/hostname is not configured/i)
+    expect(() => resolvePortalDeployment('unknown.connecthealth.info', {
+      CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
+    })).toThrow(/hostname is not configured/i)
+  })
+
+  it('rejects public browser configuration and authority-shaped module values', () => {
+    expect(resolvePortalDeployment('localhost:3600', {
+      NEXT_PUBLIC_CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
+    })).toMatchObject({ id: 'default', kind: 'organization-controller' })
+    expect(() => resolvePortalDeployment('host-st.connecthealth.info', {
+      CONTROLLER_PORTAL_HOST_PROFILES_JSON: JSON.stringify({
+        'host-st.connecthealth.info': {
+          id: 'bad', kind: 'host-controller', name: 'Bad', logoUrl: '/bad.svg', accentColor: '#123456',
+          supportUrl: 'https://support.example.org', modules: ['fabric-channel-admin'],
+          allowedSectors: ['education'], allowedJurisdictions: ['ES'], enrollmentPolicy: 'jurisdiction-provider',
+        },
+      }),
+    })).toThrow(/module/i)
+  })
+
+  it('retains the existing single-deployment presentation variables when no hostname manifest is configured', () => {
+    expect(resolvePortalDeployment('localhost:3600', {
+      CONTROLLER_PORTAL_NAME: 'Legacy configured brand',
+      CONTROLLER_PORTAL_LOGO_URL: '/brand/legacy.svg',
+      CONTROLLER_PORTAL_ACCENT_COLOR: '#112233',
+      CONTROLLER_PORTAL_SUPPORT_URL: 'https://support.example.org/legacy',
+    })).toMatchObject({
+      hostname: 'localhost',
+      id: 'default',
+      name: 'Legacy configured brand',
+      logoUrl: '/brand/legacy.svg',
+    })
   })
 })

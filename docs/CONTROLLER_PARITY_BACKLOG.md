@@ -18,6 +18,15 @@ Implemented and executable locally:
 
 Deployment gates still open:
 
+- Protected host-registry `Organization/_search` with DIDComm, paginated
+  Bundle readback and `OperationOutcome` entries, followed by the host-only
+  organization directory and status/suspend/reactivate/purge controls. The
+  existing organization-controller session must not gain host authority.
+- Shared-service hostname profiles for the remaining personal, professional
+  and host screens, with exact ingress hostname allowlisting and independently
+  verified authority for each portal family. The controller profile resolver
+  is implemented; the remaining portal families are not yet migrated.
+
 - [Organization discovery, admission, controller activation and wallet
   recovery](https://github.com/antifraudservices/antifraud-controller-nextjs/issues/1).
 - [Authoritative organization legal details, public profile and

@@ -1,7 +1,8 @@
 import Image from 'next/image'
+import { headers } from 'next/headers'
 import type { CSSProperties } from 'react'
 import { ControllerWorkspace } from '../components/ControllerWorkspace'
-import { readPortalConfig, readPortalEnvironment } from '../config/portal-config'
+import { readPortalEnvironment, resolvePortalDeployment } from '../config/portal-config'
 import { localDemoAccess } from '../security/demo-access'
 
 export const dynamic = 'force-dynamic'
@@ -23,13 +24,14 @@ function SignInRequired({ name, logoUrl, accentColor, supportUrl }: Readonly<{
   return <main className="gate-shell" style={accentStyle(accentColor)}><section className="gate-panel"><Brand name={name} logoUrl={logoUrl}/><h1>Controller sign-in required</h1><p>This portal fails closed until the trusted BFF verifies controller authority for one exact organization.</p><button type="button" disabled>Continue with configured identity provider</button><a href={supportUrl}>Deployment support</a></section></main>
 }
 
-export default function HomePage() {
-  const config = readPortalConfig()
+export default async function HomePage() {
+  const requestHeaders = await headers()
+  const config = resolvePortalDeployment(requestHeaders.get('host') || 'localhost')
   const environment = readPortalEnvironment()
   const access = localDemoAccess()
   if (!access.authenticated) return <SignInRequired {...config}/>
 
   return <div style={accentStyle(config.accentColor)}>
-    <ControllerWorkspace portalName={config.name} organizationName="Organization" environment={environment} />
+    <ControllerWorkspace portalName={config.name} organizationName="Organization" environment={environment} modules={config.modules} />
   </div>
 }

@@ -146,6 +146,7 @@ npm run test:e2e
   peers; no controller or issuer scans Fabric channels.
 
 See [architecture and acceptance](docs/ARCHITECTURE_AND_ACCEPTANCE.md) and
+[the shared multi-domain portal architecture](docs/MULTI_DOMAIN_PORTAL_ARCHITECTURE.md),
 [the controller parity backlog](docs/CONTROLLER_PARITY_BACKLOG.md). Source
 history is summarized in [provenance](docs/PROVENANCE.md). Portal UI is under
 `antifraud.services`; the Foundation is a bounded tenant of
