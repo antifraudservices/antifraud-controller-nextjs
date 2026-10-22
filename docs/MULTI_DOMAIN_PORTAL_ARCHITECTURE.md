@@ -110,6 +110,25 @@ human concepts. Animal IPS currently has no advance-directive module, so that
 screen is absent rather than emulated. Consent screens can be shared while the
 server supplies the correct professional roles, purpose and policy.
 
+## Public organization service catalogs
+
+The organization controller keeps Departments, Employee groups, Schema.org
+Places and client Services on separate screens. Creating a Place or Service is
+private by default. Publication is an explicit, separately authorized action;
+a public Service must reference a public Place from its own department.
+
+The gateway publishes the resulting claims-first graph with a DCAT descriptor
+whose jurisdiction, sector, publisher and access URL come from trusted server
+configuration. Marketplace discovery may cache that descriptor and graph for a
+bounded interval, revalidate stale entries, fetch newer versions, evict
+withdrawn datasets and reject rollback or publisher mismatches. It does not
+copy private organization structure into the public cache.
+
+Schedules, Slots, Appointments, subjects and research studies remain outside
+the public catalog and outside controller structure administration. A future
+sector adapter may translate the Schema.org graph into FHIR without changing
+the canonical controller record.
+
 ## Assistants and governed content
 
 Telephone and chat assistants consume the same trusted profile and the same
