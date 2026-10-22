@@ -104,6 +104,7 @@ export function OrganizationStructureAdministration({
   onCreateDepartment,
   onMembershipChange,
   groupTemplates,
+  mode = 'all',
 }: Readonly<{
   employees: readonly WorkforceEmployee[]
   groups: readonly OperationalGroup[]
@@ -113,6 +114,7 @@ export function OrganizationStructureAdministration({
   onCreateDepartment(name: string): void
   onMembershipChange(employeeId: string, kind: MembershipKind, membershipId: string, enabled: boolean): void
   groupTemplates?: readonly OrganizationGroupTemplateOption[]
+  mode?: 'all' | 'groups' | 'departments'
 }>) {
   const [query, setQuery] = useState('')
   const [groupName, setGroupName] = useState('')
@@ -145,23 +147,32 @@ export function OrganizationStructureAdministration({
     setDepartmentName('')
   }
 
+  const showGroups = mode === 'all' || mode === 'groups'
+  const showDepartments = mode === 'all' || mode === 'departments'
+  const title = mode === 'groups' ? 'Employee groups' : mode === 'departments' ? 'Departments' : 'Groups and departments'
+  const description = mode === 'groups'
+    ? 'Create reusable authorization groups and assign employees.'
+    : mode === 'departments'
+      ? 'Create the organization departments used by employees, places and client services.'
+      : 'Create administrative collections, assign explicit capabilities and review their employees.'
+
   return <section className="organization-structure" aria-labelledby="organization-structure-title">
-    <header className="structure-heading"><div><h2 id="organization-structure-title">Groups and departments</h2><p>Create administrative collections, assign explicit capabilities and review their employees.</p></div><label className="structure-filter"><span>Filter groups or members</span><input type="search" value={query} onChange={event => setQuery(event.currentTarget.value)} placeholder="Group, department, email or role" /></label></header>
-    <p className="authority-boundary">A group records reusable administrative authorization. Each operation still verifies the active employee, membership and exact capability.</p>
+    <header className="structure-heading"><div><h2 id="organization-structure-title">{title}</h2><p>{description}</p></div><label className="structure-filter"><span>Filter</span><input type="search" value={query} onChange={event => setQuery(event.currentTarget.value)} placeholder="Name, email or role" /></label></header>
+    {showGroups ? <p className="authority-boundary">A group records reusable administrative authorization. Each operation still verifies the active employee, membership and exact capability.</p> : null}
 
     <div className="structure-create-grid">
-      <form onSubmit={createGroup}><h3>Create an employee group</h3><label><span>Group name</span><input value={groupName} onChange={event => setGroupName(event.currentTarget.value)} required /></label><label><span>Group template</span><select value={groupTemplate} onChange={event => setGroupTemplate(event.currentTarget.value as OperationalGroupTemplate)}>{availableGroupTemplates.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label><button type="submit">Create group</button></form>
-      <form onSubmit={createDepartment}><h3>Create a department</h3><label><span>Department name</span><input value={departmentName} onChange={event => setDepartmentName(event.currentTarget.value)} required /></label><button type="submit">Create department</button></form>
+      {showGroups ? <form onSubmit={createGroup}><h3>Create an employee group</h3><label><span>Group name</span><input value={groupName} onChange={event => setGroupName(event.currentTarget.value)} required /></label><label><span>Group template</span><select value={groupTemplate} onChange={event => setGroupTemplate(event.currentTarget.value as OperationalGroupTemplate)}>{availableGroupTemplates.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label><button type="submit">Create group</button></form> : null}
+      {showDepartments ? <form onSubmit={createDepartment}><h3>Create a department</h3><label><span>Department name</span><input value={departmentName} onChange={event => setDepartmentName(event.currentTarget.value)} required /></label><button type="submit">Create department</button></form> : null}
     </div>
 
-    <section className="structure-section" aria-labelledby="employee-groups-title"><h3 id="employee-groups-title">Employee groups</h3><div className="structure-card-grid">{visibleGroups.map(group => {
+    {showGroups ? <section className="structure-section" aria-labelledby="employee-groups-title"><h3 id="employee-groups-title">Employee groups</h3><div className="structure-card-grid">{visibleGroups.map(group => {
       const memberIds = memberIdsForGroup(memberships, group.id)
       return <article key={group.id} aria-label={group.name}><header><div><h4>{group.name}</h4><p>{GROUP_TEMPLATE_LABELS[group.template]}</p></div><span>{memberCountLabel(memberIds.size)}</span></header>{group.authorizationReference ? <small>Authorization: {group.authorizationReference}</small> : null}{group.capabilities?.length ? <div className="group-capabilities" aria-label="Authorized capabilities">{group.capabilities.map(capability => <code key={capability}>{capability}</code>)}</div> : null}<fieldset><legend>Employees</legend>{employees.map(employee => <label key={employee.id}><input type="checkbox" checked={memberIds.has(employee.id)} onChange={event => onMembershipChange(employee.id, 'group', group.id, event.currentTarget.checked)} /><span>{employee.email}<small>{employee.role}</small></span></label>)}</fieldset></article>
-    })}</div>{visibleGroups.length === 0 ? <p className="structure-empty">No groups match this filter.</p> : null}</section>
+    })}</div>{visibleGroups.length === 0 ? <p className="structure-empty">No groups match this filter.</p> : null}</section> : null}
 
-    <section className="structure-section" aria-labelledby="departments-title"><h3 id="departments-title">Departments</h3><div className="structure-card-grid">{visibleDepartments.map(department => {
+    {showDepartments ? <section className="structure-section" aria-labelledby="departments-title"><h3 id="departments-title">Departments</h3><div className="structure-card-grid">{visibleDepartments.map(department => {
       const memberIds = memberIdsForDepartment(memberships, department.id)
       return <article key={department.id} aria-label={department.name}><header><div><h4>{department.name}</h4><p>Organization department</p></div><span>{memberCountLabel(memberIds.size)}</span></header><fieldset><legend>Employees</legend>{employees.map(employee => <label key={employee.id}><input type="checkbox" checked={memberIds.has(employee.id)} onChange={event => onMembershipChange(employee.id, 'department', department.id, event.currentTarget.checked)} /><span>{employee.email}<small>{employee.role}</small></span></label>)}</fieldset></article>
-    })}</div>{visibleDepartments.length === 0 ? <p className="structure-empty">No departments match this filter.</p> : null}</section>
+    })}</div>{visibleDepartments.length === 0 ? <p className="structure-empty">No departments match this filter.</p> : null}</section> : null}
   </section>
 }

@@ -12,7 +12,11 @@ describe('shared controller workspace', () => {
 
     expect(html).toContain('Organization information')
     expect(html).toContain('Members and devices')
-    expect(html).toContain('Groups and departments')
+    expect(html).toContain('Departments')
+    expect(html).toContain('Employee groups')
+    expect(html).toContain('Places')
+    expect(html).toContain('Client services')
+    expect(html).not.toContain('Groups and departments')
     expect(html).toContain('Identity and qualification evidence')
     expect(html).not.toContain('Demo — simulated blockchain')
     expect(html).toContain('data-reuse-source="antifraud-hosting-components-react@1"')

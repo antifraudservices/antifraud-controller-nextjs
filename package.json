@@ -21,7 +21,7 @@
     "antifraud-data-utils-ts": "0.1.9",
     "antifraud-hosting-components-react": "1.0.1",
     "antifraud-portal-components-react": "0.1.1",
-    "antifraud-sdk-node-ts": "0.2.5",
+    "antifraud-sdk-node-ts": "0.2.6",
     "next": "16.4.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",

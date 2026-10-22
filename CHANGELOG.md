@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Separate Departments, Employee groups, Places and Client services into
+  distinct controller screens. Create Schema.org Place and Service records,
+  publish each explicitly to the public organization catalog, and prove
+  persistence after reload through the BFF, Node SDK and gateway.
+
 - Resolve synthetic professional test roles from the trusted hostname sector
   profile and reject invitation roles outside that server-owned catalog.
 - Replace browser-authored group capability arrays with reviewed backend group

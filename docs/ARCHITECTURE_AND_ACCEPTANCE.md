@@ -34,6 +34,20 @@ or human-resources employee may record evidence about an employee through this
 portal. Users without controller administration authority do not receive these
 screens.
 
+Organization structure is deliberately split into Departments, Employee
+groups, Places and Client services. A Place and Service use the neutral
+Schema.org claims contract. The controller may create them and, with the
+separate catalog-publication capability, mark them public. Publishing a
+Service requires at least one public Place in its own public department. The
+trusted gateway supplies publisher, jurisdiction, sector and catalog URL;
+React supplies none of that authority.
+
+The structure screens do not create Schedules, Slots, Appointments,
+clients/subjects or research studies. Those are performed by separately
+authorized professional roles and groups. No FHIR resource is created in this
+increment; a later FHIR adapter may project the Schema.org graph when a sector
+requires it.
+
 ## Shared component boundary
 
 `antifraud-portal-components-react` renders controlled state and emits user
@@ -81,7 +95,10 @@ The controller portal is complete only when an executable journey proves:
     identity evidence and age-over predicates through BFF, high-level SDK and
     gateway without browser-supplied authority; and
 12. employer qualification evidence remains distinct from issuer confirmation
-    or a wallet credential.
+    or a wallet credential; and
+13. Place and Service publication survives reload, excludes private records,
+    and rejects a Service whose Place is private, unknown or belongs to another
+    department.
 
 Unit tests, fixture Playwright, screenshots or a successful response alone do
 not satisfy this condition.

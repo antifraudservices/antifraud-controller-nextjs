@@ -19,6 +19,41 @@ describe('controller administration BFF', () => {
     } as never)).rejects.toThrow(/organization authority/i)
   })
 
+  it('creates Schema.org Places and client services and changes only their catalog publication state', async () => {
+    const client = {
+      createControllerPlace: vi.fn().mockResolvedValue({}),
+      createControllerClientService: vi.fn().mockResolvedValue({}),
+      setControllerPlaceCatalogPublication: vi.fn().mockResolvedValue({}),
+      setControllerClientServiceCatalogPublication: vi.fn().mockResolvedValue({}),
+      readControllerWorkspace: vi.fn().mockResolvedValue({
+        organization: { reference: 'organization:one' }, departments: [], places: [], services: [],
+      }),
+    }
+    await executeControllerAction(client as never, {
+      type: 'create-place', name: 'Main campus', departmentReference: 'department:one',
+      geo: {latitude: 49.28, longitude: -123.12},
+    })
+    await executeControllerAction(client as never, {
+      type: 'create-client-service', name: 'Assessment', serviceType: 'assessment',
+      departmentReference: 'department:one', placeReferences: ['place:one'],
+    })
+    await executeControllerAction(client as never, {
+      type: 'set-place-catalog-publication', placeReference: 'place:one', publishInCatalog: true,
+    })
+    await executeControllerAction(client as never, {
+      type: 'set-client-service-catalog-publication', serviceReference: 'service:one', publishInCatalog: true,
+    })
+
+    expect(client.createControllerPlace).toHaveBeenCalledWith({
+      name: 'Main campus', departmentReference: 'department:one', geo: {latitude: 49.28, longitude: -123.12},
+    })
+    expect(client.createControllerClientService).toHaveBeenCalledWith({
+      name: 'Assessment', serviceType: 'assessment', departmentReference: 'department:one', placeReferences: ['place:one'],
+    })
+    expect(client.setControllerPlaceCatalogPublication).toHaveBeenCalledWith('place:one', true)
+    expect(client.setControllerClientServiceCatalogPublication).toHaveBeenCalledWith('service:one', true)
+  })
+
   it('rejects a browser-selected role outside trusted hostname policy', async () => {
     const client = { createControllerInvitation: vi.fn(), readControllerWorkspace: vi.fn() }
     await expect(executeControllerAction(client as never, {
