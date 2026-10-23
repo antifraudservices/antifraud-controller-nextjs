@@ -1,4 +1,4 @@
-// Flow contract: 1. A locally authenticated controller opens the organization workspace. 2. The controller reads gateway-owned licences, invitations, employees, devices and memberships. 3. The trusted hostname exposes canonical synthetic professional roles without turning their labels into authority. 4. Lifecycle and membership mutations return refreshed authoritative state. 5. Departments, employee groups, Schema.org Places and client Services remain separate screens; only separately authorized Places and Services enter the public catalog. 6. A reload preserves structure and catalog state. 7. Employee identity and age-over evidence travel through UI, BFF, public SDK and gateway. 8. The controller searches the real Terminology service through its BFF and published SDK, selects one canonical qualification code, and changes to Spanish without changing that identity. 9. A minimal valid PDF travels as a DIDComm attachment beside its Schema.org MediaObject, is sealed by the managed wallet, retrieved byte-for-byte by the authorized BFF, and its CID is used for qualification evidence. 10. The employer submission persists the canonical terminology identity but remains only an employer attestation. 11. The separately authenticated Professional portal reads only the addressed issuer reference, submits its decision through its own BFF and reloads authoritative Gateway state. Authorization invariant: neither browser supplies actor, organization, assignment, group authorization, sector, jurisdiction, catalog distribution, terminology credential, zone, channel or smart-contract authority. Persistence invariant: state survives browser reload for the lifetime of the owned local Gateway process; durable ledger and deployed-network proof remain separate gates.
+// Flow contract: 1. A locally authenticated controller opens the organization workspace. 2. The controller reads gateway-owned licences, invitations, employees, devices and memberships. 3. The trusted hostname exposes canonical synthetic professional roles without turning their labels into authority. 4. Lifecycle and membership mutations return refreshed authoritative state. 5. The Controller exposes Places management and Public Services management only as reusable Group templates; operational Place, Service and DCAT screens belong to shared Personal and Professional management components. 6. A reload preserves departments, groups and assignments. 7. Employee identity and age-over evidence travel through UI, BFF, public SDK and gateway. 8. The controller searches the real Terminology service through its BFF and published SDK, selects one canonical qualification code, and changes to Spanish without changing that identity. 9. A minimal valid PDF travels as a DIDComm attachment beside its Schema.org MediaObject, is sealed by the managed wallet, retrieved byte-for-byte by the authorized BFF, and its CID is used for qualification evidence. 10. The employer submission persists the canonical terminology identity but remains only an employer attestation. 11. The separately authenticated Professional portal reads only the addressed issuer reference, submits its decision through its own BFF and reloads authoritative Gateway state. Authorization invariant: neither browser supplies actor, organization, assignment, group authorization, sector, jurisdiction, catalog distribution, terminology credential, zone, channel or smart-contract authority. Persistence invariant: state survives browser reload for the lifetime of the owned local Gateway process; durable ledger and deployed-network proof remain separate gates.
 import { expect, test, type Page } from '@playwright/test'
 import { resolve } from 'node:path'
 
@@ -40,8 +40,8 @@ test('reuses the proven controller home and shared workforce administration', as
   await expect(page.locator('.controller-card').getByText('Members and devices')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Departments', { exact: true })).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Employee groups', { exact: true })).toBeVisible()
-  await expect(page.locator('.controller-card').getByText('Places', { exact: true })).toBeVisible()
-  await expect(page.locator('.controller-card').getByText('Client services', { exact: true })).toBeVisible()
+  await expect(page.locator('.controller-card').getByText('Places', { exact: true })).toHaveCount(0)
+  await expect(page.locator('.controller-card').getByText('Client services', { exact: true })).toHaveCount(0)
   await expect(page.locator('.controller-card').getByText('Identity and qualification evidence')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Clearing House')).toBeVisible()
   await captureEvidence(page, evidencePath(testInfo.project.name, 'reused-controller-home'))
@@ -112,6 +112,8 @@ test('reuses the proven controller home and shared workforce administration', as
 
   await page.getByRole('button', { name: 'Employee groups', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Employee groups', level: 2 })).toBeVisible()
+  await expect(page.getByLabel('Group template').locator('option[value="places-management"]')).toHaveText('Places management')
+  await expect(page.getByLabel('Group template').locator('option[value="public-services-management"]')).toHaveText('Public Services management')
   await expect(page.getByLabel('Group template').locator('option[value="subject-registration"]')).toHaveCount(1)
   await expect(page.getByLabel('Group template').locator('option[value="scheduling-operations"]')).toHaveCount(1)
   const clientManagers = page.getByRole('article', { name: 'Client group managers' })
@@ -136,43 +138,12 @@ test('reuses the proven controller home and shared workforce administration', as
   const createDepartment = page.getByRole('button', { name: 'Create department' })
   if (mobile) { await createDepartment.focus(); await page.keyboard.press('Enter') } else await createDepartment.click()
   await expect(page.getByRole('article', { name: `${runLabel} Operations` })).toBeVisible()
-  await page.getByRole('button', { name: 'Places', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Places', exact: true })).toBeVisible()
-  const placeName = `${runLabel} service point`
-  await page.getByLabel('Name').fill(placeName)
-  await page.getByLabel('Department').selectOption({ label: `${runLabel} Operations` })
-  await page.getByLabel('Latitude (optional)').fill('49.28')
-  await page.getByLabel('Longitude (optional)').fill('-123.12')
-  await page.getByRole('button', { name: 'Create Place' }).click()
-  const placeCard = page.getByRole('article').filter({ hasText: placeName })
-  await expect(placeCard).toBeVisible()
-  await placeCard.getByRole('checkbox', { name: 'Publish in service catalog' }).click()
-  await expect(placeCard.getByText('Public', { exact: true })).toBeVisible()
-
-  await page.getByRole('button', { name: 'Client services', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Client services', exact: true })).toBeVisible()
-  const serviceName = `${runLabel} assessment`
-  await page.getByLabel('Name').fill(serviceName)
-  await page.getByLabel('Service type').fill('qualification-assessment')
-  await page.getByLabel('Department').selectOption({ label: `${runLabel} Operations` })
-  await page.getByRole('checkbox', { name: new RegExp(placeName, 'u') }).check()
-  await page.getByRole('button', { name: 'Create client service' }).click()
-  const serviceCard = page.getByRole('article').filter({ hasText: serviceName })
-  await expect(serviceCard).toBeVisible()
-  await serviceCard.getByRole('checkbox', { name: 'Publish in service catalog' }).click()
-  await expect(serviceCard.getByText('Public', { exact: true })).toBeVisible()
-  await captureEvidence(page, evidencePath(testInfo.project.name, 'public-service-catalog'))
-
   await page.reload()
   await expect(page.getByText('Authenticated controller workspace')).toBeVisible()
   await page.getByRole('button', { name: 'Employee groups', exact: true }).click()
   await expect(page.getByRole('article', { name: `${runLabel} schedulers` })).toBeVisible()
   await page.getByRole('button', { name: 'Departments', exact: true }).click()
   await expect(page.getByRole('article', { name: `${runLabel} Operations` })).toBeVisible()
-  await page.getByRole('button', { name: 'Places', exact: true }).click()
-  await expect(page.getByRole('article').filter({ hasText: placeName }).getByText('Public', { exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'Client services', exact: true }).click()
-  await expect(page.getByRole('article').filter({ hasText: serviceName }).getByText('Public', { exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Identity and qualification evidence' }).click()
   await expect(page.getByRole('heading', { name: 'Identity evidence' })).toBeVisible()

@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
   "apphosting": {
-    "backendId": "antifraud-controller-temp",
+    "backendId": "antifraud-controller-beta",
     "rootDir": ".",
     "alwaysDeployFromSource": true,
     "ignore": [

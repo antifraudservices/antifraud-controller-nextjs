@@ -4,10 +4,11 @@ Public organization-controller portal for qualification and
 identity-evidence services.
 
 The controller manages the organization, departments, employees, invitations,
-groups, Schema.org Places, client Services and reusable group authorizations.
-Departments, employee groups, Places and Services have separate screens and
-records. Creating a record does not publish it: public catalog inclusion is a
-separate controller action. It also provides controller views of
+groups and reusable group authorizations. It provides the reviewed `Places
+management` and `Public Services management` Group templates, but does not
+contain operational Place, Service or DCAT management screens. Those workflows
+belong to versioned shared management components consumed by Connect Health
+and Antifraud Personal and Professional portals. It also provides controller views of
 the Clearing House inbox. A tenant controller sees only claims addressed to
 its organization and may act or delegate exact review capabilities. A host
 controller sees routing, delivery failures and unclaimed-reference envelopes,
@@ -16,10 +17,10 @@ tenant. This portal also owns controller-authorized employee identity
 evidence, age-over predicates and employer-reviewed qualification evidence.
 
 Schedules, Slots, Appointments, clients/subjects and research studies are not
-created from these structure screens. Authorized employees perform those
-workflows from their professional profiles and reviewed groups. The public
-catalog is Schema.org-first; FHIR conversion may be added later as an adapter
-without changing the controller's canonical write.
+created from Controller structure screens. Authorized employees perform those
+workflows from their Personal or Professional profiles and reviewed groups.
+The public catalog is Schema.org-first; FHIR conversion may be added later as
+an adapter without changing the canonical write.
 
 ## Current state
 

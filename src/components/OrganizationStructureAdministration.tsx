@@ -31,6 +31,8 @@ const GROUP_TEMPLATE_LABELS: Readonly<Record<string, string>> = Object.freeze({
   'identity-evidence-administration': 'Identity evidence administration',
   'qualification-evidence-administration': 'Qualification evidence administration',
   'clearing-house-review': 'Clearing House review',
+  'places-management': 'Places management',
+  'public-services-management': 'Public Services management',
   custom: 'Custom group without capabilities',
   'subject-registration': 'Subject registration',
   'scheduling-operations': 'Scheduling operations',
@@ -118,7 +120,7 @@ export function OrganizationStructureAdministration({
 }>) {
   const [query, setQuery] = useState('')
   const [groupName, setGroupName] = useState('')
-  const availableGroupTemplates = groupTemplates ?? Object.entries(GROUP_TEMPLATE_LABELS).slice(0, 4).map(([value, label]) => ({ value: value as OperationalGroupTemplate, label }))
+  const availableGroupTemplates = groupTemplates ?? Object.entries(GROUP_TEMPLATE_LABELS).filter(([value]) => !['subject-registration', 'scheduling-operations', 'encounter-operations', 'clinical-contribution', 'public-communication-request-publishing'].includes(value)).map(([value, label]) => ({ value: value as OperationalGroupTemplate, label }))
   const [groupTemplate, setGroupTemplate] = useState<OperationalGroupTemplate>(availableGroupTemplates[0]?.value ?? 'custom')
   const [departmentName, setDepartmentName] = useState('')
   const deferredQuery = useDeferredValue(query.trim().toLocaleLowerCase())
@@ -153,7 +155,7 @@ export function OrganizationStructureAdministration({
   const description = mode === 'groups'
     ? 'Create reusable authorization groups and assign employees.'
     : mode === 'departments'
-      ? 'Create the organization departments used by employees, places and client services.'
+      ? 'Create the organization departments used by employees and reusable authorization groups.'
       : 'Create administrative collections, assign explicit capabilities and review their employees.'
 
   return <section className="organization-structure" aria-labelledby="organization-structure-title">
