@@ -6,12 +6,11 @@ import { OrganizationWorkforceAdministration, type OrganizationWorkforceCopy, ty
 import { EmployeeMembershipDirectory, OrganizationStructureAdministration, type EmployeeOrganizationMembership, type OperationalGroup, type OperationalGroupTemplate, type OrganizationDepartment } from './OrganizationStructureAdministration'
 import { EvidenceAdministration } from './EvidenceAdministration'
 import { ClearingHouseAdministration } from './ClearingHouseAdministration'
-import { ClientServiceAdministration, PlaceAdministration, type OrganizationClientService, type OrganizationPlace } from './OrganizationCatalogAdministration'
 import type { PortalModule } from '../config/portal-config'
 import type { EmployeeRoleOption } from '../server/professional-role-policy'
 import type { OrganizationGroupTemplateOption } from '../server/organization-group-policy'
 
-type WorkspaceView = 'home' | 'organization' | 'members' | 'departments' | 'groups' | 'places' | 'services' | 'evidence' | 'clearing-house'
+type WorkspaceView = 'home' | 'organization' | 'members' | 'departments' | 'groups' | 'evidence' | 'clearing-house'
 
 const WORKFORCE_COPY: OrganizationWorkforceCopy = Object.freeze({
   title: 'Members and devices', description: 'Manage licences, invitations, members and their registered devices.', totalLicenses: 'Licences', usedLicenses: 'Assigned', freeLicenses: 'Free', employeesTitle: 'Members and registered devices', invitationsTitle: 'Pending and completed invitations', inviteTitle: 'Invite a member', emailLabel: 'Email', roleLabel: 'Administrative role', unlockSecretLabel: 'Controller PIN', invite: 'Create invitation', inviting: 'Creating…', noFreeLicenses: 'No free licences are available.', noEmployees: 'No members are registered.', noInvitations: 'No invitations have been issued.', licenseColumn: 'Licence', employeeColumn: 'Member', roleColumn: 'Assignment', statusColumn: 'Status', devicesColumn: 'Devices', actionsColumn: 'Actions', active: 'Active', inactive: 'Inactive', pending: 'Pending', accepted: 'Accepted', cancelled: 'Cancelled', disable: 'Suspend member', reactivate: 'Reactivate member', purge: 'Purge and release licence', confirmDisable: 'Suspend this member? Their licence and identity will be retained.', confirmReactivate: 'Reactivate this member?', confirmPurge: 'Purge this member permanently and release their licence?', devicesLater: 'Not reported',
@@ -20,10 +19,8 @@ const WORKFORCE_COPY: OrganizationWorkforceCopy = Object.freeze({
 const workspaceCards: readonly Readonly<{ view: WorkspaceView; module: PortalModule; title: string; description: string }>[] = Object.freeze([
   { view: 'organization', module: 'organization', title: 'Organization information', description: 'Review the authenticated organization and its authoritative administration state.' },
   { view: 'members', module: 'workforce', title: 'Members and devices', description: 'Manage licences, invitations, members and registered devices.' },
-  { view: 'departments', module: 'structure', title: 'Departments', description: 'Maintain the organization structure used by employees, Places and client services.' },
+  { view: 'departments', module: 'structure', title: 'Departments', description: 'Maintain the organization structure used by employees and authorization groups.' },
   { view: 'groups', module: 'structure', title: 'Employee groups', description: 'Assign reusable, narrowly scoped operational capabilities.' },
-  { view: 'places', module: 'structure', title: 'Places', description: 'Manage Schema.org Places and choose which ones are public.' },
-  { view: 'services', module: 'structure', title: 'Client services', description: 'Manage offered Schema.org Services and their public catalog visibility.' },
   { view: 'evidence', module: 'evidence', title: 'Identity and qualification evidence', description: 'Record employee identity checks, age-over predicates and qualification evidence.' },
   { view: 'clearing-house', module: 'clearing-house', title: 'Clearing House', description: 'Review evidence references addressed to this organization and record a decision.' },
 ])
@@ -86,8 +83,6 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   const groups = useMemo<readonly OperationalGroup[]>(() => (workspace?.groups ?? []).map(group => ({ id: group.reference, name: group.name, template: templateFor(group.capabilities), capabilities: group.capabilities, authorizationReference: group.authorizationReference })), [workspace])
   const departments = useMemo<readonly OrganizationDepartment[]>(() => (workspace?.departments ?? []).map(department => ({ id: department.reference, name: department.name })), [workspace])
   const memberships = useMemo<readonly EmployeeOrganizationMembership[]>(() => (workspace?.employees ?? []).map(employee => ({ employeeId: employee.reference, groupIds: employee.groupReferences, departmentIds: employee.departmentReferences })), [workspace])
-  const places = useMemo<readonly OrganizationPlace[]>(() => (workspace?.places ?? []).map(place => ({ id: place.reference, name: place.name, departmentId: place.departmentReference, ...(place.containedInPlaceReference ? { containedInPlaceId: place.containedInPlaceReference } : {}), ...(place.geo ? { geo: place.geo } : {}), publishInCatalog: place.publishInCatalog })), [workspace])
-  const services = useMemo<readonly OrganizationClientService[]>(() => (workspace?.services ?? []).map(service => ({ id: service.reference, name: service.name, ...(service.description ? { description: service.description } : {}), serviceType: service.serviceType, departmentId: service.departmentReference, placeIds: service.placeReferences, publishInCatalog: service.publishInCatalog })), [workspace])
 
   function open(next: WorkspaceView): void { setView(next); window.scrollTo({ top: 0 }) }
   function invite(): void { void mutate({ type: 'create-invitation', email: email.trim(), role, groupReferences: inviteGroupReferences, departmentReferences: inviteDepartmentReferences }).then(() => { setEmail(''); setRole(''); setUnlockSecret(''); setInviteGroupReferences([]); setInviteDepartmentReferences([]) }) }
@@ -97,8 +92,6 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   }
   function createGroup(name: string, template: OperationalGroupTemplate): void { void mutate({ type: 'create-group', name, template }) }
   function createDepartment(name: string): void { void mutate({ type: 'create-department', name }) }
-  function createPlace(input: Readonly<{ name: string; departmentReference: string; geo?: Readonly<{ latitude: number; longitude: number }> }>): void { void mutate({ type: 'create-place', ...input }) }
-  function createClientService(input: Readonly<{ name: string; description?: string; serviceType: string; departmentReference: string; placeReferences: readonly string[] }>): void { void mutate({ type: 'create-client-service', ...input }) }
 
   const displayedOrganization = workspace?.organization.displayName || organizationName
   const enabledModules = modules ?? workspaceCards.map(item => item.module)
@@ -116,8 +109,6 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
         {view === 'organization' ? <InformationalPanel title="Organization information"><p>This state is read from the authenticated gateway organization.</p><dl className="controller-facts"><div><dt>Organization</dt><dd>{displayedOrganization}</dd></div><div><dt>Reference</dt><dd>{workspace?.organization.reference ?? 'Loading…'}</dd></div><div><dt>Employees</dt><dd>{employees.length}</dd></div><div><dt>Notifications</dt><dd>{workspace?.notifications.length ?? 0}</dd></div></dl></InformationalPanel> : null}
         {view === 'departments' ? <OrganizationStructureAdministration mode="departments" employees={employees} groups={groups} departments={departments} memberships={memberships} groupTemplates={groupTemplates} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
         {view === 'groups' ? <OrganizationStructureAdministration mode="groups" employees={employees} groups={groups} departments={departments} memberships={memberships} groupTemplates={groupTemplates} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
-        {view === 'places' ? <PlaceAdministration departments={departments} places={places} onCreate={createPlace} onPublicationChange={(placeReference, publishInCatalog) => { void mutate({ type: 'set-place-catalog-publication', placeReference, publishInCatalog }) }} /> : null}
-        {view === 'services' ? <ClientServiceAdministration departments={departments} places={places} services={services} onCreate={createClientService} onPublicationChange={(serviceReference, publishInCatalog) => { void mutate({ type: 'set-client-service-catalog-publication', serviceReference, publishInCatalog }) }} /> : null}
         {view === 'evidence' ? <EvidenceAdministration employees={workspace?.employees ?? []} /> : null}
         {view === 'clearing-house' ? <ClearingHouseAdministration /> : null}
       </>}
@@ -129,6 +120,8 @@ function templateFor(capabilities: readonly string[]): OperationalGroupTemplate 
   if (capabilities.includes('identity.evidence.record')) return 'identity-evidence-administration'
   if (capabilities.includes('qualification-evidence:create')) return 'qualification-evidence-administration'
   if (capabilities.includes('qualification-inbox:list')) return 'clearing-house-review'
+  if (capabilities.includes('controller.catalog.publish')) return 'public-services-management'
+  if (capabilities.includes('controller.structure.write')) return 'places-management'
   if (capabilities.some(capability => capability.startsWith('organization/Subject.c?organization=Organization/'))) return 'subject-registration'
   if (capabilities.includes('organization/Schedule.cruds')) return 'scheduling-operations'
   if (capabilities.includes('organization/Encounter.cruds')) return 'encounter-operations'

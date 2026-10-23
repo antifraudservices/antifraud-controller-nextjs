@@ -19,39 +19,33 @@ describe('controller administration BFF', () => {
     } as never)).rejects.toThrow(/organization authority/i)
   })
 
-  it('creates Schema.org Places and client services and changes only their catalog publication state', async () => {
+  it('rejects Place and public Service management actions outside the Controller boundary', async () => {
     const client = {
       createControllerPlace: vi.fn().mockResolvedValue({}),
       createControllerClientService: vi.fn().mockResolvedValue({}),
       setControllerPlaceCatalogPublication: vi.fn().mockResolvedValue({}),
       setControllerClientServiceCatalogPublication: vi.fn().mockResolvedValue({}),
-      readControllerWorkspace: vi.fn().mockResolvedValue({
-        organization: { reference: 'organization:one' }, departments: [], places: [], services: [],
-      }),
+      readControllerWorkspace: vi.fn(),
     }
-    await executeControllerAction(client as never, {
+    await expect(executeControllerAction(client as never, {
       type: 'create-place', name: 'Main campus', departmentReference: 'department:one',
       geo: {latitude: 49.28, longitude: -123.12},
-    })
-    await executeControllerAction(client as never, {
+    } as never)).rejects.toThrow('controller_action_not_allowed')
+    await expect(executeControllerAction(client as never, {
       type: 'create-client-service', name: 'Assessment', serviceType: 'assessment',
       departmentReference: 'department:one', placeReferences: ['place:one'],
-    })
-    await executeControllerAction(client as never, {
+    } as never)).rejects.toThrow('controller_action_not_allowed')
+    await expect(executeControllerAction(client as never, {
       type: 'set-place-catalog-publication', placeReference: 'place:one', publishInCatalog: true,
-    })
-    await executeControllerAction(client as never, {
+    } as never)).rejects.toThrow('controller_action_not_allowed')
+    await expect(executeControllerAction(client as never, {
       type: 'set-client-service-catalog-publication', serviceReference: 'service:one', publishInCatalog: true,
-    })
+    } as never)).rejects.toThrow('controller_action_not_allowed')
 
-    expect(client.createControllerPlace).toHaveBeenCalledWith({
-      name: 'Main campus', departmentReference: 'department:one', geo: {latitude: 49.28, longitude: -123.12},
-    })
-    expect(client.createControllerClientService).toHaveBeenCalledWith({
-      name: 'Assessment', serviceType: 'assessment', departmentReference: 'department:one', placeReferences: ['place:one'],
-    })
-    expect(client.setControllerPlaceCatalogPublication).toHaveBeenCalledWith('place:one', true)
-    expect(client.setControllerClientServiceCatalogPublication).toHaveBeenCalledWith('service:one', true)
+    expect(client.createControllerPlace).not.toHaveBeenCalled()
+    expect(client.createControllerClientService).not.toHaveBeenCalled()
+    expect(client.setControllerPlaceCatalogPublication).not.toHaveBeenCalled()
+    expect(client.setControllerClientServiceCatalogPublication).not.toHaveBeenCalled()
   })
 
   it('rejects a browser-selected role outside trusted hostname policy', async () => {
@@ -73,6 +67,20 @@ describe('controller administration BFF', () => {
     expect(client.createControllerGroup).toHaveBeenCalledWith({
       name: 'Schedulers',
       capabilities: ['organization/Appointment.cruds', 'organization/Schedule.cruds', 'organization/Slot.cruds'],
+    })
+  })
+
+  it('derives public Services management capabilities in the trusted BFF', async () => {
+    const client = {
+      createControllerGroup: vi.fn().mockResolvedValue({}),
+      readControllerWorkspace: vi.fn().mockResolvedValue({ organization: { reference: 'Organization/example' } }),
+    }
+    await executeControllerAction(client as never, {
+      type: 'create-group', name: 'Public Services managers', template: 'public-services-management',
+    } as never, { allowedEmployeeRoles: [], allowedGroupTemplates: ['public-services-management'] as never })
+    expect(client.createControllerGroup).toHaveBeenCalledWith({
+      name: 'Public Services managers',
+      capabilities: ['controller.structure.write', 'controller.catalog.publish'],
     })
   })
 

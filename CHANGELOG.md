@@ -4,10 +4,16 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-- Separate Departments, Employee groups, Places and Client services into
-  distinct controller screens. Create Schema.org Place and Service records,
-  publish each explicitly to the public organization catalog, and prove
-  persistence after reload through the BFF, Node SDK and gateway.
+- Add sector-neutral `Places management` and `Public Services management`
+  group templates. Public Services management includes the separately reviewed
+  catalog-publication capability for the Schema.org Place and Service graph
+  distributed through DCAT. Keep the Controller at Group creation, assignment
+  and reusable authorization; operational catalog management belongs to shared
+  Connect Health and Antifraud Personal/Professional components.
+
+- Remove operational Place and Client service screens and action routes from
+  the Controller portal so catalog management cannot drift into its authority
+  boundary.
 
 - Resolve synthetic professional test roles from the trusted hostname sector
   profile and reject invitation roles outside that server-owned catalog.

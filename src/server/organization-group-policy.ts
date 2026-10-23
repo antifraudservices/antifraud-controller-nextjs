@@ -8,6 +8,8 @@ export type OrganizationGroupTemplate =
   | 'identity-evidence-administration'
   | 'qualification-evidence-administration'
   | 'clearing-house-review'
+  | 'places-management'
+  | 'public-services-management'
   | 'custom'
   | typeof OrganizationWorkflowGroupKinds[keyof typeof OrganizationWorkflowGroupKinds]
 
@@ -17,6 +19,8 @@ const ADMINISTRATIVE_TEMPLATES: readonly OrganizationGroupTemplateOption[] = Obj
   Object.freeze({ value: 'identity-evidence-administration', label: 'Identity evidence administration' }),
   Object.freeze({ value: 'qualification-evidence-administration', label: 'Qualification evidence administration' }),
   Object.freeze({ value: 'clearing-house-review', label: 'Clearing House review' }),
+  Object.freeze({ value: 'places-management', label: 'Places management' }),
+  Object.freeze({ value: 'public-services-management', label: 'Public Services management' }),
   Object.freeze({ value: 'custom', label: 'Custom group without capabilities' }),
 ])
 
@@ -38,6 +42,8 @@ export function resolveGroupTemplateCapabilities(template: OrganizationGroupTemp
   if (template === 'identity-evidence-administration') return Object.freeze(['identity.subject.create', 'identity.subject.update', 'identity.evidence.record', 'identity.claim.verify', 'identity.subject.attest', 'identity.relationship.attest'])
   if (template === 'qualification-evidence-administration') return Object.freeze(['qualification-evidence:create'])
   if (template === 'clearing-house-review') return Object.freeze(['qualification-inbox:list', 'qualification-evidence:decide'])
+  if (template === 'places-management') return Object.freeze(['controller.structure.write'])
+  if (template === 'public-services-management') return Object.freeze(['controller.structure.write', 'controller.catalog.publish'])
   if (template === 'custom') return Object.freeze([])
   if (template === OrganizationWorkflowGroupKinds.SubjectRegistration) return Object.freeze([buildOrganizationSubjectRegisterCapability(organizationReference)])
   if (template === OrganizationWorkflowGroupKinds.SchedulingOperations) return Object.freeze([

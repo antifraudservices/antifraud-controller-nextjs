@@ -34,13 +34,23 @@ or human-resources employee may record evidence about an employee through this
 portal. Users without controller administration authority do not receive these
 screens.
 
-Organization structure is deliberately split into Departments, Employee
-groups, Places and Client services. A Place and Service use the neutral
-Schema.org claims contract. The controller may create them and, with the
-separate catalog-publication capability, mark them public. Publishing a
-Service requires at least one public Place in its own public department. The
-trusted gateway supplies publisher, jurisdiction, sector and catalog URL;
-React supplies none of that authority.
+The Controller boundary ends at organization structure, reusable authorization
+and membership. It exposes reviewed `Places management` and `Public Services
+management` Group templates, assigns employees to those Groups and preserves
+their server-derived capabilities. It does not render operational Place,
+Service or DCAT management screens.
+
+Operational management will be implemented once as shared components consumed
+by Connect Health and Antifraud Personal and Professional portals. A Place and
+Service use the neutral Schema.org claims contract. The trusted BFF will verify
+active assignment, Group membership and reusable authorization; the gateway
+supplies publisher, jurisdiction, sector and catalog URL. The browser supplies
+none of that authority. `Places management` does not publish automatically;
+`Public Services management` includes the separately reviewed catalog
+publication capability for the public Place and Service graph distributed
+through DCAT. The model is sector-neutral for blood and plasma donation,
+physiotherapy, education, insurance brokerage, legal services and other
+organization catalogs.
 
 The structure screens do not create Schedules, Slots, Appointments,
 clients/subjects or research studies. Those are performed by separately
@@ -96,9 +106,8 @@ The controller portal is complete only when an executable journey proves:
     gateway without browser-supplied authority; and
 12. employer qualification evidence remains distinct from issuer confirmation
     or a wallet credential; and
-13. Place and Service publication survives reload, excludes private records,
-    and rejects a Service whose Place is private, unknown or belongs to another
-    department.
+13. the Controller exposes the two catalog-management Group templates but no
+    operational Place, Service or DCAT management route.
 
 Unit tests, fixture Playwright, screenshots or a successful response alone do
 not satisfy this condition.

@@ -112,10 +112,14 @@ server supplies the correct professional roles, purpose and policy.
 
 ## Public organization service catalogs
 
-The organization controller keeps Departments, Employee groups, Schema.org
-Places and client Services on separate screens. Creating a Place or Service is
-private by default. Publication is an explicit, separately authorized action;
-a public Service must reference a public Place from its own department.
+The organization Controller creates and assigns the reusable `Places
+management` and `Public Services management` Groups. Its UI stops at that
+authorization boundary. Versioned shared management components will be
+consumed by Connect Health and Antifraud Personal and Professional portals to
+create and maintain Schema.org Places and client Services. Creating a Place or
+Service is private by default. Publication is an explicit, separately
+authorized action; a public Service must reference a public Place from its own
+department.
 
 The gateway publishes the resulting claims-first graph with a DCAT descriptor
 whose jurisdiction, sector, publisher and access URL come from trusted server
