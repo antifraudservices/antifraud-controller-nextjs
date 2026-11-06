@@ -15,8 +15,8 @@ All notable changes to this project are documented here.
   group templates. Public Services management includes the separately reviewed
   catalog-publication capability for the Schema.org Place and Service graph
   distributed through DCAT. Keep the Controller at Group creation, assignment
-  and reusable authorization; operational catalog management belongs to shared
-  Connect Health and Antifraud Personal/Professional components.
+  and reusable authorization; operational catalog management belongs to
+  shared components consumed by authorized personal/professional portals.
 
 - Remove operational Place and Client service screens and action routes from
   the Controller portal so catalog management cannot drift into its authority

@@ -41,8 +41,8 @@ their server-derived capabilities. It does not render operational Place,
 Service or DCAT management screens.
 
 Operational management will be implemented once as shared components consumed
-by Connect Health and Antifraud Personal and Professional portals. A Place and
-Service use the neutral Schema.org claims contract. The trusted BFF will verify
+by authorized personal and professional portals. A Place and Service use the
+neutral Schema.org claims contract. The trusted BFF will verify
 active assignment, Group membership and reusable authorization; the gateway
 supplies publisher, jurisdiction, sector and catalog URL. The browser supplies
 none of that authority. `Places management` does not publish automatically;

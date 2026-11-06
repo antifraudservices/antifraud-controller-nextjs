@@ -53,25 +53,25 @@ describe('server-owned portal environment', () => {
 
 describe('server-owned hostname deployment manifest', () => {
   const profiles = JSON.stringify({
-    'controller-st.connecthealth.info': {
+    'tenant-controller.test.invalid': {
       id: 'neutral-controller',
       kind: 'organization-controller',
       name: 'Organization Controller',
       logoUrl: '/brand/controller-mark.svg',
       accentColor: '#075f68',
-      supportUrl: 'https://support.connecthealth.info/controller',
+      supportUrl: 'https://support.test.invalid/controller',
       modules: ['organization', 'workforce', 'evidence'],
       allowedSectors: ['health-care', 'animal-care', 'education'],
       allowedJurisdictions: ['ES', 'CA', 'US'],
       enrollmentPolicy: 'jurisdiction-provider',
     },
-    'host-st.connecthealth.info': {
+    'host-controller.test.invalid': {
       id: 'neutral-host',
       kind: 'host-controller',
       name: 'Federation Host',
       logoUrl: '/brand/controller-mark.svg',
       accentColor: '#123456',
-      supportUrl: 'https://support.connecthealth.info/host',
+      supportUrl: 'https://support.test.invalid/host',
       modules: ['host-organizations', 'host-observability'],
       allowedSectors: ['health-care', 'animal-care', 'education'],
       allowedJurisdictions: ['ES', 'CA', 'US'],
@@ -80,10 +80,10 @@ describe('server-owned hostname deployment manifest', () => {
   })
 
   it('resolves an exact request hostname through a private allowlisted manifest', () => {
-    expect(resolvePortalDeployment('controller-st.connecthealth.info:443', {
+    expect(resolvePortalDeployment('tenant-controller.test.invalid:443', {
       CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
     })).toMatchObject({
-      hostname: 'controller-st.connecthealth.info',
+      hostname: 'tenant-controller.test.invalid',
       id: 'neutral-controller',
       kind: 'organization-controller',
       modules: ['organization', 'workforce', 'evidence'],
@@ -92,7 +92,7 @@ describe('server-owned hostname deployment manifest', () => {
   })
 
   it('keeps host authority separate even when the same service binary renders both portals', () => {
-    expect(resolvePortalDeployment('host-st.connecthealth.info', {
+    expect(resolvePortalDeployment('host-controller.test.invalid', {
       CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
     })).toMatchObject({
       kind: 'host-controller',
@@ -101,10 +101,10 @@ describe('server-owned hostname deployment manifest', () => {
   })
 
   it('fails closed for an unknown or suffix-spoofed hostname when a manifest is configured', () => {
-    expect(() => resolvePortalDeployment('controller-st.connecthealth.info.attacker.invalid', {
+    expect(() => resolvePortalDeployment('tenant-controller.test.invalid.attacker.invalid', {
       CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
     })).toThrow(/hostname is not configured/i)
-    expect(() => resolvePortalDeployment('unknown.connecthealth.info', {
+    expect(() => resolvePortalDeployment('unknown.test.invalid', {
       CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
     })).toThrow(/hostname is not configured/i)
   })
@@ -113,9 +113,9 @@ describe('server-owned hostname deployment manifest', () => {
     expect(resolvePortalDeployment('localhost:3600', {
       NEXT_PUBLIC_CONTROLLER_PORTAL_HOST_PROFILES_JSON: profiles,
     })).toMatchObject({ id: 'default', kind: 'organization-controller' })
-    expect(() => resolvePortalDeployment('host-st.connecthealth.info', {
+    expect(() => resolvePortalDeployment('host-controller.test.invalid', {
       CONTROLLER_PORTAL_HOST_PROFILES_JSON: JSON.stringify({
-        'host-st.connecthealth.info': {
+        'host-controller.test.invalid': {
           id: 'bad', kind: 'host-controller', name: 'Bad', logoUrl: '/bad.svg', accentColor: '#123456',
           supportUrl: 'https://support.example.org', modules: ['fabric-channel-admin'],
           allowedSectors: ['education'], allowedJurisdictions: ['ES'], enrollmentPolicy: 'jurisdiction-provider',

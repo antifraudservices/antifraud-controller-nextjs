@@ -92,10 +92,9 @@ The provider performs the proof and returns an auditable result.
 
 ## Personal and professional portals
 
-The same architecture applies to a neutral personal or professional portal,
-for example a generic staging hostname plus approved VetChain, UHC or SOSChain
-aliases. Shared screens and BFF operations remain versioned once. A trusted
-manifest selects:
+The same architecture applies to neutral personal or professional portals
+exposed through approved host aliases. Shared screens and BFF operations
+remain versioned once. A trusted manifest selects:
 
 - human or animal subject profile;
 - jurisdictional terminology and required fields;
@@ -115,8 +114,8 @@ server supplies the correct professional roles, purpose and policy.
 The organization Controller creates and assigns the reusable `Places
 management` and `Public Services management` Groups. Its UI stops at that
 authorization boundary. Versioned shared management components will be
-consumed by Connect Health and Antifraud Personal and Professional portals to
-create and maintain Schema.org Places and client Services. Creating a Place or
+consumed by authorized personal and professional portals to create and
+maintain Schema.org Places and client Services. Creating a Place or
 Service is private by default. Publication is an explicit, separately
 authorized action; a public Service must reference a public Place from its own
 department.
@@ -149,9 +148,9 @@ into clinical advice.
 ## Authentication across aliases
 
 Cookies, CORS, redirect URLs and WebAuthn relying-party identifiers are
-hostname-sensitive. A passkey registered for `connecthealth.info` cannot be
-silently reused on `vetchain.app` or `unid.online`, because they are different
-registrable domains. A deployment must choose one of two explicit models:
+hostname-sensitive. A passkey registered for one portal's registrable domain
+cannot be silently reused on another registrable domain. A deployment must
+choose one of two explicit models:
 
 - register a separate passkey for each relying-party domain; or
 - authenticate at one canonical domain and return a short-lived, audience-
@@ -167,7 +166,7 @@ unrelated registrable domains.
 3. Add the protected host `Organization/_search` manager contract and paginated
    DIDComm Bundle readback.
 4. Add the host-operator screen only after that contract is executable.
-5. Port Vet, UHC and SOS personal/professional screens to the shared modules.
+5. Port sector-specific personal/professional screens to the shared modules.
 6. Add jurisdiction content and enrollment providers independently.
 7. Prove local UI to BFF to SDK to gateway readback, then local-network and
    Test Network in that order.

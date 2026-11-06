@@ -1,16 +1,16 @@
 # Antifraud Controller Portal
 
 Public host- and tenant-controller portal for the complete Antifraud Data
-Space. It is sector-neutral and can govern organizations reached from
-SOSChain, VetChain, UHC, GlobalDataCare or another branded portal without
-moving controller authority into those portals.
+Space. It is sector-neutral and governs organizations independently of the
+branded or sector-specific portals through which their users access services.
+Controller authority never moves into those consuming portals.
 
 The tenant controller manages the organization, departments, employees, invitations,
 groups and reusable group authorizations. It provides the reviewed `Places
 management` and `Public Services management` Group templates, but does not
 contain operational Place, Service or DCAT management screens. Those workflows
-belong to versioned shared management components consumed by Connect Health
-and Antifraud Personal and Professional portals. It also provides controller views of
+belong to versioned shared management components consumed by authorized
+personal and professional portals. It also provides controller views of
 the Clearing House inbox. A tenant controller sees only claims addressed to
 its organization and may act or delegate exact review capabilities. A host
 controller sees routing, delivery failures and unclaimed-reference envelopes,
