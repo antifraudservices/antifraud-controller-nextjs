@@ -2,9 +2,13 @@
 
 ## Boundary
 
-This public repository owns organization-controller UI, including
+This public repository owns the neutral controller portal for both host and
+tenant controllers across the whole data space. Host controllers administer
+the protected host registry and its tenants without gaining access to tenant
+evidence. Tenant controllers administer their own organization, including
 controller-authorized employee identity, age-over and employer
-qualification-evidence workflows. Do not add unrelated role applications.
+qualification-evidence workflows. Do not add sector portals or unrelated role
+applications.
 
 Browser-selected organization, employee, group or role never grants
 authority. Production must fail closed until the trusted backend confirms the

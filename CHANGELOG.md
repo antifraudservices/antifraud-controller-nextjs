@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Define the application explicitly as the sector-neutral controller portal
+  for both host administration and tenant administration across the complete
+  data space. Branded personal and professional portals remain consumers or
+  links, never owners of controller authority.
+- Update the shared hosting screens to `antifraud-hosting-components-react`
+  1.0.2.
+
 - Add sector-neutral `Places management` and `Public Services management`
   group templates. Public Services management includes the separately reviewed
   catalog-publication capability for the Schema.org Place and Service graph

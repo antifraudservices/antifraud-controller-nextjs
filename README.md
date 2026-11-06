@@ -1,9 +1,11 @@
 # Antifraud Controller Portal
 
-Public organization-controller portal for qualification and
-identity-evidence services.
+Public host- and tenant-controller portal for the complete Antifraud Data
+Space. It is sector-neutral and can govern organizations reached from
+SOSChain, VetChain, UHC, GlobalDataCare or another branded portal without
+moving controller authority into those portals.
 
-The controller manages the organization, departments, employees, invitations,
+The tenant controller manages the organization, departments, employees, invitations,
 groups and reusable group authorizations. It provides the reviewed `Places
 management` and `Public Services management` Group templates, but does not
 contain operational Place, Service or DCAT management screens. Those workflows
@@ -86,7 +88,7 @@ employee performs the operation from the appropriate professional profile.
 The same person may use the same email for controller and employee invitations,
 but those remain separate profiles and wallets with separate authority.
 
-One deployed service can render either the organization-controller workspace
+One deployed service can render either the tenant-controller workspace
 or the separate host-controller workspace from an exact private hostname
 manifest. The host workspace lists the protected organization registry and
 performs status, suspend, reactivate and eligible inactive purge operations
