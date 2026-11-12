@@ -26,6 +26,11 @@ an adapter without changing the canonical write.
 
 ## Current state
 
+The [organization-subject and department-index proposal](docs/ORGANIZATION_SUBJECT_AND_DEPARTMENT_INDEXES.md)
+separates customer organizations from service/index providers, organizational
+units from sectoral sections, and administration from confidential data access.
+It records pending acceptance requirements and adds no runtime behavior.
+
 The local application reads and mutates organization and workforce state
 through the backend-for-frontend, public Node SDK and local gateway. It reuses
 `antifraud-common-components-react` for entry, sign-in and evidence,

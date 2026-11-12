@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Document the proposed organization-subject and department-index model,
+  including provider inheritance, configurable creation fields, separation of
+  administrative and confidential-data authority, and provenance-preserving
+  reassignment. Mark implementation and patent coverage as unverified; no
+  runtime or deployment changes are included.
+
 - Define the application explicitly as the sector-neutral controller portal
   for both host administration and tenant administration across the complete
   data space. Branded personal and professional portals remain consumers or
