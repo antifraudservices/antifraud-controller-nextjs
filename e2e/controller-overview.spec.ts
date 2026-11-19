@@ -201,6 +201,7 @@ test('reuses the proven controller home and shared workforce administration', as
 
   const professionalPage = await page.context().newPage()
   await professionalPage.goto('http://127.0.0.1:3610')
+  await professionalPage.getByRole('button', {name: 'Work', exact: true}).click()
   await professionalPage.getByRole('button', {name: 'Issuer inbox'}).click()
   const addressedEvidence = professionalPage.getByRole('article', {name: evidenceLocator})
   await expect(addressedEvidence).toContainText('pending-issuer-confirmation')
@@ -212,6 +213,7 @@ test('reuses the proven controller home and shared workforce administration', as
   await addressedEvidence.getByRole('button', {name: 'Confirm evidence'}).click()
   await expect(addressedEvidence).toContainText('confirmed')
   await professionalPage.reload()
+  await professionalPage.getByRole('button', {name: 'Work', exact: true}).click()
   await professionalPage.getByRole('button', {name: 'Issuer inbox'}).click()
   await expect(professionalPage.getByRole('article', {name: evidenceLocator})).toContainText('confirmed')
   await professionalPage.screenshot({ path: evidencePath(testInfo.project.name, 'professional-addressed-inbox'), fullPage: true })

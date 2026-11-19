@@ -4,6 +4,39 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Add an App Hosting profile for the Test Network controller, with separate
+  Firebase settings, host assignments and Gateway credentials.
+
+- Limit automatic approval to enabled technical sectors in Test Network.
+  Earlier automatic decisions outside this scope return to review when retried.
+
+- Show the original policy conditions and effective country coverage on
+  newly recorded decisions, including after the host changes the policy.
+
+- Let authorized host reviewers inspect approved and rejected cases with
+  their evidence references, decision source and policy revision.
+
+- Show the application reference in the review queue while ICA evidence is
+  pending, and reject an attempt to associate another case with the binding.
+
+- Require matching ICA evidence to reuse a prior organization admission
+  approval, preserving its audit history when verification is unavailable.
+
+- Add a Test Network review queue for explicitly delegated host reviewers.
+  Manual decisions use the current decision revision and append a reviewer
+  audit event. Approval requires verified ICA organization evidence.
+
+- Add a Test Network decision lookup for the assigned Gateway service.
+  Missing or out-of-scope decision records require review.
+- Evaluate new admissions against the current host policy and record the
+  result, policy revision and ICA evidence references atomically. Preserve
+  committed approvals when a registration is retried.
+
+- Add Test Network host admission settings with Firebase phone sign-in,
+  scoped controller assignments, country selection, evidence conditions and
+  versioned Firestore audit history.
+- Update Next.js to 16.4.5 for the upstream security fixes.
+
 - Document the proposed organization-subject and department-index model,
   including provider inheritance, configurable creation fields, separation of
   administrative and confidential-data authority, and provenance-preserving
