@@ -1,0 +1,64 @@
+env:
+  - variable: ANTIFRAUD_DEPLOYMENT_STAGE
+    value: staging
+    availability: [RUNTIME]
+  - variable: CONTROLLER_DEPLOYMENT_STAGE
+    value: staging
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_NETWORK_KIND
+    value: test-network
+    availability: [BUILD, RUNTIME]
+  - variable: ANTIFRAUD_TEST_NETWORK_ENABLED
+    value: "true"
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_PRODUCTION_ENABLED
+    value: "false"
+    availability: [RUNTIME]
+  - variable: CONTROLLER_DEMO_MODE
+    value: "false"
+    availability: [RUNTIME]
+  - variable: SOS_GATEWAY_HOST_NETWORK
+    value: test-network
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_ADMISSION_FIREBASE_PROJECT_ID
+    secret: antifraud-test-network-firebase-project
+    availability: [RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    secret: antifraud-test-network-firebase-project
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: antifraud-test-network-firebase-web-api-key
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    secret: antifraud-test-network-firebase-web-auth-domain
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    secret: antifraud-test-network-firebase-web-app-id
+    availability: [BUILD, RUNTIME]
+  - variable: CONTROLLER_PORTAL_HOST_PROFILES_JSON
+    secret: antifraud-test-network-controller-host-profiles
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_ADMISSION_POLICY_HOSTNAME
+    secret: antifraud-test-network-controller-policy-hostname
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_ADMISSION_CONTROLLER_ASSIGNMENTS_JSON
+    secret: antifraud-test-network-controller-assignments
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_ADMISSION_GATEWAY_BEARER
+    secret: antifraud-test-network-admission-gateway-bearer
+    availability: [RUNTIME]
+  - variable: SOS_GATEWAY_HOST_BASE_URL
+    secret: antifraud-test-network-gateway-origin
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_GATEWAY_BASE_URL
+    secret: antifraud-test-network-gateway-origin
+    availability: [RUNTIME]
+  - variable: ANTIFRAUD_GATEWAY_BEARER
+    secret: antifraud-test-network-controller-gateway-bearer
+    availability: [RUNTIME]
+  - variable: TERMINOLOGY_BASE_URL
+    secret: antifraud-test-network-terminology-origin
+    availability: [RUNTIME]
+  - variable: TERMINOLOGY_SERVICE_TOKEN
+    secret: antifraud-test-network-terminology-token
+    availability: [RUNTIME]

@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react'
 import { ControllerSignInRequired } from '../../components/ControllerSignInRequired'
 import { ControllerWorkspace } from '../../components/ControllerWorkspace'
 import { HostOrganizationAdministration } from '../../components/HostOrganizationAdministration'
+import { HostAdmissionPhoneSignIn } from '../../components/HostAdmissionPhoneSignIn'
 import { readPortalEnvironment, resolvePortalDeployment } from '../../config/portal-config'
 import { localDemoAccess } from '../../security/demo-access'
 import { resolveHostOperatorAccess } from '../../security/host-operator-authority'
@@ -24,6 +25,18 @@ export default async function ControllerEnvironmentPage({ params }: Readonly<{ p
   if (!enabled || selected !== environment.active) return <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>
   const style = { '--portal-accent': config.accentColor } as CSSProperties
   if (config.kind === 'host-controller') {
+    if (selected === 'test-network') {
+      const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+      const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+      const projectId = process.env.ANTIFRAUD_ADMISSION_FIREBASE_PROJECT_ID
+      const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+      if (apiKey && authDomain && projectId && appId && projectId === process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        && config.modules.includes('host-organizations')) {
+        return <div style={style}><HostAdmissionPhoneSignIn firebase={{ apiKey, authDomain, projectId, appId }}
+          sectors={config.allowedSectors} jurisdictions={config.allowedJurisdictions}/></div>
+      }
+      return <ControllerSignInRequired mode="trusted" supportUrl={config.supportUrl}/>
+    }
     const access = resolveHostOperatorAccess()
     return <div style={style}>{access.authenticated ? <HostOrganizationAdministration portalName={config.name} allowedSectors={config.allowedSectors}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
   }
