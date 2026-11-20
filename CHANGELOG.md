@@ -8,6 +8,9 @@ All notable changes to this project are documented here.
   departments, evidence, or Clearing House operations leave other features
   accessible. Keep existing assignments when editing just one membership type.
 
+- Allow assigned host controllers to enable tenant-owned external catalogue
+  publication per sector, with a revisioned policy and audit history.
+
 - Add an App Hosting profile for the Test Network controller, with separate
   Firebase settings, host assignments and Gateway credentials.
 

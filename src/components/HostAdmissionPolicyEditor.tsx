@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, type FormEvent } from 'react'
+import { HostCataloguePublicationPolicyEditor } from './HostCataloguePublicationPolicyEditor'
 import { ADMISSION_CONDITIONS, supportsAutomaticAdmission, type AdmissionCondition, type AdmissionPolicy, type VersionedAdmissionPolicy } from '../config/host-admission-policy'
 
 type GetToken = () => Promise<string>
@@ -104,7 +105,9 @@ function SectorPolicy({ sector, getToken }: { sector: string; getToken: GetToken
   </>
 }
 
-export function HostAdmissionPolicyEditor({ sectors, getToken }: { sectors: readonly string[]; getToken: GetToken }) {
+export function HostAdmissionPolicyEditor({ sectors, getToken, showCataloguePublication }: {
+  sectors: readonly string[]; getToken: GetToken; showCataloguePublication?: boolean
+}) {
   const [sector, setSector] = useState(sectors[0] || '')
   return <section aria-labelledby="admission-policy-title">
     <h1 id="admission-policy-title">Organization admission policy</h1>
@@ -113,6 +116,7 @@ export function HostAdmissionPolicyEditor({ sectors, getToken }: { sectors: read
         {sectors.map(value => <option key={value} value={value}>{value}</option>)}
       </select></label>
       <SectorPolicy key={sector} sector={sector} getToken={getToken}/>
+      {showCataloguePublication && <HostCataloguePublicationPolicyEditor key={sector} sector={sector} getToken={getToken}/>}
     </>}
   </section>
 }
