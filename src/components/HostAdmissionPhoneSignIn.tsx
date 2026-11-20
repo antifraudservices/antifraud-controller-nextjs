@@ -8,8 +8,8 @@ import { HostAdmissionReview } from './HostAdmissionReview'
 
 type FirebaseWebConfig = Readonly<{ apiKey: string; authDomain: string; projectId: string; appId: string }>
 
-export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions }: {
-  firebase: FirebaseWebConfig; sectors: readonly string[]; jurisdictions: readonly string[]
+export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions, showCataloguePublication }: {
+  firebase: FirebaseWebConfig; sectors: readonly string[]; jurisdictions: readonly string[]; showCataloguePublication?: boolean
 }) {
   const captcha = useRef<HTMLDivElement>(null)
   const verifier = useRef<RecaptchaVerifier | null>(null)
@@ -73,7 +73,7 @@ export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions }: {
       <button type="button" aria-pressed={view === 'review'} onClick={() => setView('review')}>Review queue</button>
     </nav>
     {view === 'policy'
-      ? <HostAdmissionPolicyEditor sectors={sectors} getToken={getToken}/>
+      ? <HostAdmissionPolicyEditor sectors={sectors} getToken={getToken} showCataloguePublication={showCataloguePublication}/>
       : <HostAdmissionReview sectors={sectors} jurisdictions={jurisdictions} getToken={getToken}/>}
   </main>
 

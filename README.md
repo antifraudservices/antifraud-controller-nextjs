@@ -205,3 +205,22 @@ bindings under `antifraud.online`.
 ## Licence
 
 Copyright 2026 Antifraud Services Inc. Licensed under Apache-2.0.
+
+### External catalogue publication policy
+
+With `PONTUS_X_PUBLICATION_ENABLED=true`, a host controller can manage
+publication permissions for each sector from the Test Network admission
+policy panel. The initial setting allows publication only by the host
+operator. Enabling tenant publication allows each authorized tenant
+controller to use their organization's enrolled wallet.
+
+The server stores this setting in the configured administrative Firestore
+project, in `hostCataloguePublicationPolicies`. The document ID is the
+SHA-256 digest of the JSON array `[hostDid, network, sector]`. Each update is
+revision-checked and records the controller and update time under
+`changes`. The store contains policy and audit records only.
+
+The publisher BFF must load this policy for the dataset's actual sector in
+its SDK authorization callback before accepting a tenant wallet enrollment
+or a publication request. An absent policy uses host-only mode. An unresolved
+policy prevents tenant publication.

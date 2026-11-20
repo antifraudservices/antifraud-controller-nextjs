@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Allow assigned host controllers to enable tenant-owned external catalogue
+  publication per sector, with a revisioned policy and audit history.
+
 - Add an App Hosting profile for the Test Network controller, with separate
   Firebase settings, host assignments and Gateway credentials.
 
