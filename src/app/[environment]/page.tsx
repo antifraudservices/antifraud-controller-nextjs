@@ -33,7 +33,8 @@ export default async function ControllerEnvironmentPage({ params }: Readonly<{ p
       if (apiKey && authDomain && projectId && appId && projectId === process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
         && config.modules.includes('host-organizations')) {
         return <div style={style}><HostAdmissionPhoneSignIn firebase={{ apiKey, authDomain, projectId, appId }}
-          sectors={config.allowedSectors} jurisdictions={config.allowedJurisdictions}/></div>
+          sectors={config.allowedSectors} jurisdictions={config.allowedJurisdictions}
+          showCataloguePublication={process.env.PONTUS_X_PUBLICATION_ENABLED === 'true'}/></div>
       }
       return <ControllerSignInRequired mode="trusted" supportUrl={config.supportUrl}/>
     }
