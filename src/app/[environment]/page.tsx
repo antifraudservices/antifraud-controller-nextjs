@@ -34,6 +34,7 @@ export default async function ControllerEnvironmentPage({ params }: Readonly<{ p
         && config.modules.includes('host-organizations')) {
         return <div style={style}><HostAdmissionPhoneSignIn firebase={{ apiKey, authDomain, projectId, appId }}
           sectors={config.allowedSectors} jurisdictions={config.allowedJurisdictions}
+          directoryPortalName={process.env.HOST_ADMIN_UID?.trim() ? config.name : undefined}
           showCataloguePublication={process.env.PONTUS_X_PUBLICATION_ENABLED === 'true'}/></div>
       }
       return <ControllerSignInRequired mode="trusted" supportUrl={config.supportUrl}/>
@@ -42,5 +43,5 @@ export default async function ControllerEnvironmentPage({ params }: Readonly<{ p
     return <div style={style}>{access.authenticated ? <HostOrganizationAdministration portalName={config.name} allowedSectors={config.allowedSectors}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
   }
   const access = localDemoAccess()
-  return <div style={style}>{access.authenticated ? <ControllerWorkspace portalName={config.name} organizationName="Organization" modules={config.modules} employeeRoles={allowedEmployeeRoleOptions(config.allowedSectors)} groupTemplates={allowedGroupTemplateOptions(config.allowedSectors)}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
+  return <div style={style}>{access.authenticated ? <ControllerWorkspace portalName={config.name} organizationName="Organization" modules={config.modules} disabledFeatures={config.disabledControllerFeatures} employeeRoles={allowedEmployeeRoleOptions(config.allowedSectors)} groupTemplates={allowedGroupTemplateOptions(config.allowedSectors)}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
 }

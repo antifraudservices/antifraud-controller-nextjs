@@ -22,6 +22,18 @@ describe('shared controller workspace', () => {
     expect(html).toContain('data-reuse-source="antifraud-hosting-components-react@1"')
   })
 
+  it('marks only the configured unsupported feature before any gateway request', () => {
+    const html = renderToStaticMarkup(<ControllerWorkspace
+      portalName="Controller"
+      organizationName="Example Organization"
+      disabledFeatures={['groups']}
+    />)
+
+    expect(html).toMatch(/<button[^>]*data-unavailable="true"[^>]*>Employee groups<\/button>/)
+    expect(html).not.toMatch(/<button[^>]*data-unavailable="true"[^>]*>Members and devices<\/button>/)
+    expect(html).not.toMatch(/<button[^>]*data-unavailable="true"[^>]*>Departments<\/button>/)
+  })
+
   it('renders only modules enabled by the server-resolved hostname manifest', () => {
     const html = renderToStaticMarkup(<ControllerWorkspace
       portalName="Education Controller"

@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Replace the controller workspace request with independent resource routes,
+  separate availability and targeted readback after writes. Add employee
+  search by email and role.
+
+- Expose the host registry to the verified Test Network operator and forward
+  that operator’s token to the asynchronous gateway registry operations.
+
+- Show server-configured unsupported sections before loading the controller
+  workspace, without marking unresolved independent sections unavailable.
+
+- Document the resource-specific controller BFF contract and report an
+  unavailable workspace separately from unsupported resource capabilities.
+
 - Show controller availability per gateway feature. Unsupported groups,
   departments, evidence, or Clearing House operations leave other features
   accessible. Keep existing assignments when editing just one membership type.

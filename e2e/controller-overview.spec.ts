@@ -1,4 +1,4 @@
-// Flow contract: 1. A locally authenticated controller opens the organization workspace. 2. The controller reads gateway-owned licences, invitations, employees, devices and memberships. 3. The trusted hostname exposes canonical synthetic professional roles without turning their labels into authority. 4. Lifecycle and membership mutations return refreshed authoritative state. 5. The Controller exposes Places management and Public Services management only as reusable Group templates; operational Place, Service and DCAT screens belong to shared Personal and Professional management components. 6. A reload preserves departments, groups and assignments. 7. Employee identity and age-over evidence travel through UI, BFF, public SDK and gateway. 8. The controller searches the real Terminology service through its BFF and published SDK, selects one canonical qualification code, and changes to Spanish without changing that identity. 9. A minimal valid PDF travels as a DIDComm attachment beside its Schema.org MediaObject, is sealed by the managed wallet, retrieved byte-for-byte by the authorized BFF, and its CID is used for qualification evidence. 10. The employer submission persists the canonical terminology identity but remains only an employer attestation. 11. The separately authenticated Professional portal reads only the addressed issuer reference, submits its decision through its own BFF and reloads authoritative Gateway state. Authorization invariant: neither browser supplies actor, organization, assignment, group authorization, sector, jurisdiction, catalog distribution, terminology credential, zone, channel or smart-contract authority. 12. A second trusted profile explains unavailable group and qualification operations while the controller creates and reloads a department through the same backend. Persistence invariant: state survives browser reload for the lifetime of the owned local Gateway process; durable ledger and deployed-network proof remain separate gates.
+// Flow contract: 1. A locally authenticated controller opens organization administration. 2. The controller exercises independent reads and exact email search, then reads gateway-owned licences, invitations, employees, devices and memberships. 3. The trusted hostname exposes canonical synthetic professional roles without turning their labels into authority. 4. Lifecycle and membership mutations return refreshed authoritative state. 5. The Controller exposes Places management and Public Services management only as reusable Group templates; operational Place, Service and DCAT screens belong to shared Personal and Professional management components. 6. A reload preserves departments, groups and assignments. 7. Employee identity and age-over evidence travel through UI, BFF, public SDK and gateway. 8. The controller searches the real Terminology service through its BFF and published SDK, selects one canonical qualification code, and changes to Spanish without changing that identity. 9. A minimal valid PDF travels as a DIDComm attachment beside its Schema.org MediaObject, is sealed by the managed wallet, retrieved byte-for-byte by the authorized BFF, and its CID is used for qualification evidence. 10. The employer submission persists the canonical terminology identity but remains only an employer attestation. 11. The separately authenticated Professional portal reads only the addressed issuer reference, submits its decision through its own BFF and reloads authoritative Gateway state. Authorization invariant: neither browser supplies actor, organization, assignment, group authorization, sector, jurisdiction, catalog distribution, terminology credential, zone, channel or smart-contract authority. 12. A second trusted profile explains unavailable group and qualification operations while the controller creates and reloads a department through the same backend. Persistence invariant: state survives browser reload for the lifetime of the owned local Gateway process; durable ledger and deployed-network proof remain separate gates.
 import { expect, test, type Page } from '@playwright/test'
 import { resolve } from 'node:path'
 
@@ -35,7 +35,7 @@ test('reuses the proven controller home and shared workforce administration', as
   await page.getByRole('link', { name: /Demo — simulated blockchain/u }).click()
   await expect(page).toHaveTitle(/Antifraud Controller/u)
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible()
-  await expect(page.getByText('Authenticated controller workspace')).toBeVisible()
+  await expect(page.getByText('Authenticated controller')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Organization information')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Members and devices')).toBeVisible()
   await expect(page.locator('.controller-card').getByText('Departments', { exact: true })).toBeVisible()
@@ -103,7 +103,7 @@ test('reuses the proven controller home and shared workforce administration', as
   const invitationAssignments = page.getByRole('region', { name: 'Initial invitation assignments' })
   await invitationAssignments.getByRole('checkbox', { name: 'Identity evidence assistants' }).check()
   await invitationAssignments.getByRole('checkbox', { name: 'Operations', exact: true }).check()
-  await page.getByLabel('Email').fill(`audit.viewer.${runLabel.toLowerCase()}@example.invalid`)
+  await page.getByLabel('Email', { exact: true }).fill(`audit.viewer.${runLabel.toLowerCase()}@example.invalid`)
   await page.getByLabel('Administrative role').selectOption('audit-viewer')
   await page.getByLabel('Controller PIN').fill('123456')
   await page.getByRole('button', { name: 'Create invitation' }).click()
@@ -139,7 +139,7 @@ test('reuses the proven controller home and shared workforce administration', as
   if (mobile) { await createDepartment.focus(); await page.keyboard.press('Enter') } else await createDepartment.click()
   await expect(page.getByRole('article', { name: `${runLabel} Operations` })).toBeVisible()
   await page.reload()
-  await expect(page.getByText('Authenticated controller workspace')).toBeVisible()
+  await expect(page.getByText('Authenticated controller')).toBeVisible()
   await page.getByRole('button', { name: 'Employee groups', exact: true }).click()
   await expect(page.getByRole('article', { name: `${runLabel} schedulers` })).toBeVisible()
   await page.getByRole('button', { name: 'Departments', exact: true }).click()
@@ -255,8 +255,12 @@ test('reuses the proven controller home and shared workforce administration', as
 
 
 test('unavailable sections leave independent controller operations working', async ({ page }, testInfo) => {
+  const controllerReads: string[] = []
+  page.on('request', request => {
+    if (request.method() === 'GET' && request.url().includes('/api/controller/')) controllerReads.push(new URL(request.url()).pathname)
+  })
   await page.goto('http://localhost:3600/demo')
-  const navigation = page.getByRole('navigation', { name: 'Controller workspace' })
+  const navigation = page.getByRole('navigation', { name: 'Controller administration' })
   const groups = navigation.getByRole('button', { name: 'Employee groups' })
   await expect(groups).toHaveAttribute('data-unavailable', 'true')
   await groups.click()
@@ -276,12 +280,17 @@ test('unavailable sections leave independent controller operations working', asy
   await page.getByRole('button', { name: 'Create department' }).click()
   const department = page.getByRole('article', { name })
   await expect(department).toBeVisible()
+  expect(controllerReads).toEqual(expect.arrayContaining(['/api/controller/organization', '/api/controller/employees', '/api/controller/licences', '/api/controller/devices']))
+  expect(controllerReads).not.toContain('/api/controller/workspace')
+  expect(controllerReads).not.toContain('/api/controller/groups')
 
   async function serviceManagerGroups(): Promise<readonly string[]> {
-    const response = await page.request.get('http://127.0.0.1:3600/api/controller/workspace')
+    const response = await page.request.get('http://127.0.0.1:3600/api/controller/employees', {
+      params: { email: 'service.manager@example.invalid' },
+    })
     expect(response.ok()).toBe(true)
-    const { workspace } = await response.json()
-    const member = workspace.employees.find((employee: { email: string }) => employee.email === 'service.manager@example.invalid')
+    const employees = await response.json()
+    const member = employees.find((employee: { email: string }) => employee.email === 'service.manager@example.invalid')
     expect(member.groupReferences.length).toBeGreaterThan(0)
     return member.groupReferences
   }
@@ -294,6 +303,18 @@ test('unavailable sections leave independent controller operations working', asy
   await page.reload()
   await navigation.getByRole('button', { name: 'Departments' }).click()
   await expect(assignment).toBeChecked()
+
+  await navigation.getByRole('button', { name: 'Members and devices' }).click()
+  const memberEmail = 'service.manager@example.invalid'
+  await page.getByLabel('Member email', { exact: true }).fill(memberEmail)
+  const searchResponse = page.waitForResponse(response => {
+    const url = new URL(response.url())
+    return url.pathname === '/api/controller/employees' && url.searchParams.get('email') === memberEmail
+  })
+  await page.getByRole('button', { name: 'Search members' }).click()
+  expect((await searchResponse).ok()).toBe(true)
+  await expect(page.getByRole('row').filter({ hasText: memberEmail })).toBeVisible()
+  await expect(page.getByRole('row').filter({ hasText: 'member.manager@example.invalid' })).toHaveCount(0)
 
   await navigation.getByRole('button', { name: 'Identity and qualification evidence' }).click()
   await expect(page.getByRole('heading', { name: 'Qualification evidence', exact: true })).toBeVisible()

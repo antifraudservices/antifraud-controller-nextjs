@@ -1,6 +1,5 @@
 import { controllerRouteAccess } from '../../../../server/controller-route-access'
 import { NextResponse } from 'next/server'
-import { controllerWorkspaceResult } from '../../../../server/controller-gateway-capabilities'
 import { localGatewayClient } from '../../../../server/antifraud-gateway'
 import { executeControllerAction, type ControllerAction } from '../../../../server/controller-administration'
 import { allowedEmployeeRoleOptions } from '../../../../server/professional-role-policy'
@@ -15,10 +14,10 @@ export async function POST(request: Request) {
     const disabledFeatures = deployment.disabledControllerFeatures
     const allowedEmployeeRoles = allowedEmployeeRoleOptions(deployment.allowedSectors).map(role => role.value)
     const allowedGroupTemplates = allowedGroupTemplateOptions(deployment.allowedSectors).map(template => template.value)
-    const workspace = await executeControllerAction(localGatewayClient(), action, {
+    await executeControllerAction(localGatewayClient(), action, {
       allowedEmployeeRoles, allowedGroupTemplates, disabledFeatures,
     })
-    return NextResponse.json(controllerWorkspaceResult(workspace, disabledFeatures))
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Controller action failed.' }, { status: 400 })
   }

@@ -10,3 +10,18 @@ export function resolveHostOperatorAccess(environment: NodeJS.ProcessEnv = proce
   }
   return Object.freeze({ authenticated: true, subject })
 }
+
+/** Verifies the operator's own token before forwarding it to the selected host. */
+export async function authorizeHostDirectoryOperator(
+  authorization: string,
+  expectedUid: string | undefined,
+  verify: (token: string) => Promise<Readonly<{ uid: string }>>,
+): Promise<string | undefined> {
+  const credential = /^Bearer ([^\s]+)$/i.exec(authorization)?.[1]
+  if (!expectedUid || !credential) return undefined
+  try {
+    return (await verify(credential)).uid === expectedUid ? credential : undefined
+  } catch {
+    return undefined
+  }
+}
