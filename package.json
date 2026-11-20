@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "antifraud-common-components-react": "1.0.0",
-    "antifraud-data-utils-ts": "0.1.9",
+    "antifraud-data-utils-ts": "0.4.4",
     "antifraud-hosting-components-react": "1.0.2",
     "antifraud-portal-components-react": "0.1.1",
     "antifraud-sdk-node-ts": "0.3.2",
@@ -28,7 +28,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sos-data-utils-ts": "0.6.15",
-    "sos-sdk-node-ts": "0.1.13",
+    "sos-sdk-node-ts": "0.6.4",
     "terminology-components-react": "0.2.0",
     "terminology-sdk-node-ts": "0.3.2"
   },

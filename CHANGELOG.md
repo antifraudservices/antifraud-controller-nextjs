@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Let phone-authenticated organization controllers publish and update products
+  and services with their registered tenant identity. Read the public catalogue
+  back from the gateway after each update.
+
 - Replace the controller workspace request with independent resource routes,
   separate availability and targeted readback after writes. Add employee
   search by email and role.

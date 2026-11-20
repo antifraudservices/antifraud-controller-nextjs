@@ -1,5 +1,7 @@
+// Flow contract: reuse shared test fixtures and canonical types; do not introduce duplicated literals.
 // Flow contract: a verified Firebase phone session may administer admission policy only through an exact server-owned host controller assignment.
 import { describe, expect, it, vi } from 'vitest'
+import { verifyFirebasePhoneSession } from '../src/security/firebase-phone-session'
 import { authorizeHostAdmissionController } from '../src/security/host-admission-authority'
 
 const assignment = {
@@ -64,5 +66,22 @@ describe('host admission authority', () => {
     const reviewerOnly = { ...assignment, reviewJurisdictions: ['ES-MD'], managePolicy: false }
     await expect(authorizeHostAdmissionController('Bearer session', scope, [reviewerOnly], verify)).resolves.toBeUndefined()
     await expect(authorizeHostAdmissionController('Bearer session', scope, [reviewerOnly], verify, 'ES-MD')).resolves.toEqual({ uid: assignment.uid })
+  })
+})
+
+describe('Firebase phone session', () => {
+  it('passes the verified phone identity and original token to the controller caller', async () => {
+    const token = 'firebase-session'
+    const verify = vi.fn().mockResolvedValue(decoded)
+    await expect(verifyFirebasePhoneSession('Bearer ' + token, verify)).resolves.toEqual({
+      uid: decoded.uid, phone: decoded.phone_number, token,
+    })
+    expect(verify).toHaveBeenCalledExactlyOnceWith(token)
+  })
+
+  it('does not accept an email-provider session with a phone claim', async () => {
+    await expect(verifyFirebasePhoneSession('Bearer firebase-session', async () => ({
+      ...decoded, firebase: { sign_in_provider: 'password' },
+    }))).resolves.toBeUndefined()
   })
 })

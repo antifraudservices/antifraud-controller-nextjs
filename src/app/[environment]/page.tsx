@@ -1,6 +1,8 @@
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import type { CSSProperties } from 'react'
+import { RegisteredControllerCatalogue } from '../../components/RegisteredControllerCatalogue'
+import { cataloguePhoneConfig } from '../../server/registered-catalogue'
 import { ControllerSignInRequired } from '../../components/ControllerSignInRequired'
 import { ControllerWorkspace } from '../../components/ControllerWorkspace'
 import { HostOrganizationAdministration } from '../../components/HostOrganizationAdministration'
@@ -41,6 +43,13 @@ export default async function ControllerEnvironmentPage({ params }: Readonly<{ p
     }
     const access = resolveHostOperatorAccess()
     return <div style={style}>{access.authenticated ? <HostOrganizationAdministration portalName={config.name} allowedSectors={config.allowedSectors}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
+  }
+  if (selected === 'test-network' && config.modules.includes('organization')) {
+    const phone = cataloguePhoneConfig(config.hostname)
+    if (phone) {
+      const { loopbackTest, ...firebase } = phone
+      return <div style={style}><RegisteredControllerCatalogue firebase={firebase} virtualPhoneTest={loopbackTest}/></div>
+    }
   }
   const access = localDemoAccess()
   return <div style={style}>{access.authenticated ? <ControllerWorkspace portalName={config.name} organizationName="Organization" modules={config.modules} disabledFeatures={config.disabledControllerFeatures} employeeRoles={allowedEmployeeRoleOptions(config.allowedSectors)} groupTemplates={allowedGroupTemplateOptions(config.allowedSectors)}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
