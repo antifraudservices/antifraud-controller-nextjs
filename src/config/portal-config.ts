@@ -1,3 +1,5 @@
+import { CONTROLLER_FEATURES, type ControllerFeature } from './controller-features'
+
 export type PortalConfig = Readonly<{
   name: string
   logoUrl: string
@@ -22,6 +24,7 @@ export type PortalDeployment = PortalConfig & Readonly<{
   id: string
   kind: PortalKind
   modules: readonly PortalModule[]
+  disabledControllerFeatures: readonly ControllerFeature[]
   allowedSectors: readonly string[]
   allowedJurisdictions: readonly string[]
   enrollmentPolicy: 'jurisdiction-provider'
@@ -48,6 +51,7 @@ const DEFAULT_DEPLOYMENT = Object.freeze({
   id: 'default',
   kind: 'organization-controller' as const,
   modules: Object.freeze(['organization', 'workforce', 'structure', 'evidence', 'clearing-house'] as const),
+  disabledControllerFeatures: Object.freeze([] as ControllerFeature[]),
   allowedSectors: Object.freeze([] as string[]),
   allowedJurisdictions: Object.freeze([] as string[]),
   enrollmentPolicy: 'jurisdiction-provider' as const,
@@ -88,6 +92,10 @@ function parseDeployment(hostname: string, value: unknown): PortalDeployment {
   if (kind !== 'organization-controller' && kind !== 'host-controller') throw new Error('Portal kind is invalid.')
   const modules = stringList(profile.modules, 'Portal modules')
   if (modules.some(module => !PORTAL_MODULES.includes(module as PortalModule))) throw new Error('Portal module is not supported.')
+  const disabledControllerFeatures = stringList(profile.disabledControllerFeatures ?? [], 'Disabled controller features')
+  if (disabledControllerFeatures.some(feature => !CONTROLLER_FEATURES.includes(feature as ControllerFeature))) {
+    throw new Error('Controller feature is not supported.')
+  }
   const name = String(profile.name || '').trim()
   const logoUrl = String(profile.logoUrl || '').trim()
   const accentColor = String(profile.accentColor || '').trim()
@@ -108,6 +116,7 @@ function parseDeployment(hostname: string, value: unknown): PortalDeployment {
     accentColor,
     supportUrl,
     modules: modules as readonly PortalModule[],
+    disabledControllerFeatures: disabledControllerFeatures as readonly ControllerFeature[],
     allowedSectors: stringList(profile.allowedSectors, 'Allowed sectors'),
     allowedJurisdictions: stringList(profile.allowedJurisdictions, 'Allowed jurisdictions'),
     enrollmentPolicy: 'jurisdiction-provider',

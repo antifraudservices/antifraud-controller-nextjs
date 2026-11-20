@@ -64,11 +64,15 @@ export function EmployeeMembershipDirectory({
   departments,
   memberships,
   onMembershipChange,
+  groupsAvailable = true,
+  departmentsAvailable = true,
 }: Readonly<{
   employees: readonly WorkforceEmployee[]
   groups: readonly OperationalGroup[]
   departments: readonly OrganizationDepartment[]
   memberships: readonly EmployeeOrganizationMembership[]
+  groupsAvailable?: boolean
+  departmentsAvailable?: boolean
   onMembershipChange(employeeId: string, kind: MembershipKind, membershipId: string, enabled: boolean): void
 }>) {
   const [query, setQuery] = useState('')
@@ -85,10 +89,10 @@ export function EmployeeMembershipDirectory({
       {filteredEmployees.map(employee => {
         const membership = memberships.find(item => item.employeeId === employee.id)
         return <details key={employee.id} className="employee-membership" role="group" aria-label={`${employee.email} memberships`}>
-          <summary><span><strong>{employee.email}</strong><small>{employee.role}</small></span><span>{(membership?.groupIds.length ?? 0) + (membership?.departmentIds.length ?? 0)} assignments</span></summary>
+          <summary><span><strong>{employee.email}</strong><small>{employee.role}</small></span><span>{(groupsAvailable ? membership?.groupIds.length ?? 0 : 0) + (departmentsAvailable ? membership?.departmentIds.length ?? 0 : 0)} assignments</span></summary>
           <div className="membership-options">
-            <fieldset><legend>Operational groups</legend>{groups.map(group => <label key={group.id}><input type="checkbox" checked={membership?.groupIds.includes(group.id) ?? false} onChange={event => onMembershipChange(employee.id, 'group', group.id, event.currentTarget.checked)} /><span>{group.name}<small>{GROUP_TEMPLATE_LABELS[group.template]}</small></span></label>)}</fieldset>
-            <fieldset><legend>Departments</legend>{departments.map(department => <label key={department.id}><input type="checkbox" checked={membership?.departmentIds.includes(department.id) ?? false} onChange={event => onMembershipChange(employee.id, 'department', department.id, event.currentTarget.checked)} /><span>{department.name}</span></label>)}</fieldset>
+            {groupsAvailable ? <fieldset><legend>Operational groups</legend>{groups.map(group => <label key={group.id}><input type="checkbox" checked={membership?.groupIds.includes(group.id) ?? false} onChange={event => onMembershipChange(employee.id, 'group', group.id, event.currentTarget.checked)} /><span>{group.name}<small>{GROUP_TEMPLATE_LABELS[group.template]}</small></span></label>)}</fieldset> : null}
+            {departmentsAvailable ? <fieldset><legend>Departments</legend>{departments.map(department => <label key={department.id}><input type="checkbox" checked={membership?.departmentIds.includes(department.id) ?? false} onChange={event => onMembershipChange(employee.id, 'department', department.id, event.currentTarget.checked)} /><span>{department.name}</span></label>)}</fieldset> : null}
           </div>
         </details>
       })}

@@ -1,5 +1,6 @@
 import { createCipheriv, randomBytes, randomUUID } from 'node:crypto'
 import { AntifraudGatewayClient } from 'antifraud-sdk-node-ts'
+import { ControllerGatewayFailure } from './controller-gateway-capabilities'
 
 const localClaimsKey = randomBytes(32)
 
@@ -9,10 +10,15 @@ function requiredEnvironment(name: 'ANTIFRAUD_GATEWAY_BASE_URL' | 'ANTIFRAUD_GAT
   return value
 }
 
-export function localGatewayClient(): AntifraudGatewayClient {
+export function localGatewayClient(preserveStatus = false): AntifraudGatewayClient {
   return new AntifraudGatewayClient({
     baseUrl: requiredEnvironment('ANTIFRAUD_GATEWAY_BASE_URL'),
     bearerCredential: async () => requiredEnvironment('ANTIFRAUD_GATEWAY_BEARER'),
+    fetch: preserveStatus ? async (input, init) => {
+      const response = await fetch(input, { ...init, redirect: 'error', cache: 'no-store' })
+      if (!response.ok) throw new ControllerGatewayFailure(response.status)
+      return response
+    } : undefined,
   })
 }
 

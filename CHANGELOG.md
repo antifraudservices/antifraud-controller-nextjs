@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Show controller availability per gateway feature. Unsupported groups,
+  departments, evidence, or Clearing House operations leave other features
+  accessible. Keep existing assignments when editing just one membership type.
+
 - Add an App Hosting profile for the Test Network controller, with separate
   Firebase settings, host assignments and Gateway credentials.
 

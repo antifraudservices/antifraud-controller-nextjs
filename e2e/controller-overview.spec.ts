@@ -1,4 +1,4 @@
-// Flow contract: 1. A locally authenticated controller opens the organization workspace. 2. The controller reads gateway-owned licences, invitations, employees, devices and memberships. 3. The trusted hostname exposes canonical synthetic professional roles without turning their labels into authority. 4. Lifecycle and membership mutations return refreshed authoritative state. 5. The Controller exposes Places management and Public Services management only as reusable Group templates; operational Place, Service and DCAT screens belong to shared Personal and Professional management components. 6. A reload preserves departments, groups and assignments. 7. Employee identity and age-over evidence travel through UI, BFF, public SDK and gateway. 8. The controller searches the real Terminology service through its BFF and published SDK, selects one canonical qualification code, and changes to Spanish without changing that identity. 9. A minimal valid PDF travels as a DIDComm attachment beside its Schema.org MediaObject, is sealed by the managed wallet, retrieved byte-for-byte by the authorized BFF, and its CID is used for qualification evidence. 10. The employer submission persists the canonical terminology identity but remains only an employer attestation. 11. The separately authenticated Professional portal reads only the addressed issuer reference, submits its decision through its own BFF and reloads authoritative Gateway state. Authorization invariant: neither browser supplies actor, organization, assignment, group authorization, sector, jurisdiction, catalog distribution, terminology credential, zone, channel or smart-contract authority. Persistence invariant: state survives browser reload for the lifetime of the owned local Gateway process; durable ledger and deployed-network proof remain separate gates.
+// Flow contract: 1. A locally authenticated controller opens the organization workspace. 2. The controller reads gateway-owned licences, invitations, employees, devices and memberships. 3. The trusted hostname exposes canonical synthetic professional roles without turning their labels into authority. 4. Lifecycle and membership mutations return refreshed authoritative state. 5. The Controller exposes Places management and Public Services management only as reusable Group templates; operational Place, Service and DCAT screens belong to shared Personal and Professional management components. 6. A reload preserves departments, groups and assignments. 7. Employee identity and age-over evidence travel through UI, BFF, public SDK and gateway. 8. The controller searches the real Terminology service through its BFF and published SDK, selects one canonical qualification code, and changes to Spanish without changing that identity. 9. A minimal valid PDF travels as a DIDComm attachment beside its Schema.org MediaObject, is sealed by the managed wallet, retrieved byte-for-byte by the authorized BFF, and its CID is used for qualification evidence. 10. The employer submission persists the canonical terminology identity but remains only an employer attestation. 11. The separately authenticated Professional portal reads only the addressed issuer reference, submits its decision through its own BFF and reloads authoritative Gateway state. Authorization invariant: neither browser supplies actor, organization, assignment, group authorization, sector, jurisdiction, catalog distribution, terminology credential, zone, channel or smart-contract authority. 12. A second trusted profile explains unavailable group and qualification operations while the controller creates and reloads a department through the same backend. Persistence invariant: state survives browser reload for the lifetime of the owned local Gateway process; durable ledger and deployed-network proof remain separate gates.
 import { expect, test, type Page } from '@playwright/test'
 import { resolve } from 'node:path'
 
@@ -251,4 +251,52 @@ test('reuses the proven controller home and shared workforce administration', as
   expect(groupIntent).toContain('"template":"scheduling-operations"')
   expect(groupIntent).not.toContain('"capabilities"')
   expect(errors).toEqual([])
+})
+
+
+test('unavailable sections leave independent controller operations working', async ({ page }, testInfo) => {
+  await page.goto('http://localhost:3600/demo')
+  const navigation = page.getByRole('navigation', { name: 'Controller workspace' })
+  const groups = navigation.getByRole('button', { name: 'Employee groups' })
+  await expect(groups).toHaveAttribute('data-unavailable', 'true')
+  await groups.click()
+  await expect(page.getByText('This feature is not available on the connected gateway.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Create group' })).toHaveCount(0)
+  await captureEvidence(page, evidencePath(testInfo.project.name, 'gateway-feature-unavailable'))
+
+  const directAction = await page.request.post('http://localhost:3600/api/controller/actions', {
+    data: { type: 'create-group', name: 'Blocked group', template: 'custom' },
+  })
+  expect(directAction.ok()).toBe(false)
+  expect(await directAction.json()).toMatchObject({ error: 'controller_feature_unsupported' })
+
+  await navigation.getByRole('button', { name: 'Departments' }).click()
+  const name = `Availability ${testInfo.project.name}`
+  await page.getByLabel('Department name').fill(name)
+  await page.getByRole('button', { name: 'Create department' }).click()
+  const department = page.getByRole('article', { name })
+  await expect(department).toBeVisible()
+
+  async function serviceManagerGroups(): Promise<readonly string[]> {
+    const response = await page.request.get('http://127.0.0.1:3600/api/controller/workspace')
+    expect(response.ok()).toBe(true)
+    const { workspace } = await response.json()
+    const member = workspace.employees.find((employee: { email: string }) => employee.email === 'service.manager@example.invalid')
+    expect(member.groupReferences.length).toBeGreaterThan(0)
+    return member.groupReferences
+  }
+  const previousGroups = await serviceManagerGroups()
+  const assignment = department.getByRole('checkbox', { name: /service.manager@example.invalid/u })
+  await assignment.click()
+  await expect(assignment).toBeChecked()
+  expect(await serviceManagerGroups()).toEqual(previousGroups)
+
+  await page.reload()
+  await navigation.getByRole('button', { name: 'Departments' }).click()
+  await expect(assignment).toBeChecked()
+
+  await navigation.getByRole('button', { name: 'Identity and qualification evidence' }).click()
+  await expect(page.getByRole('heading', { name: 'Qualification evidence', exact: true })).toBeVisible()
+  await expect(page.getByText('This feature is not available on the connected gateway.')).toBeVisible()
+  await expect(page.getByRole('heading', { name: /identity evidence/iu, exact: true })).toBeVisible()
 })

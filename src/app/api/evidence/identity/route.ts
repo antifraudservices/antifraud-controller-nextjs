@@ -1,11 +1,12 @@
+import { controllerRouteAccess } from '../../../../server/controller-route-access'
 import { NextResponse } from 'next/server'
-import { localDemoAccess } from '../../../../security/demo-access'
 import { localGatewayClient, localOperationReference, sealLocalClaims } from '../../../../server/antifraud-gateway'
 
 export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
-  if (!localDemoAccess().authenticated) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
+  const access = controllerRouteAccess(request, 'identity-evidence')
+  if (access.response) return access.response
   try {
     const intent = await request.json() as {
       subjectReference: string
