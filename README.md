@@ -107,7 +107,9 @@ departments, groups and notifications from independent authenticated BFF
 routes. A missing endpoint affects only its resource. A denied or temporary
 failure has its own status. After a write, the affected resources are read
 again. See the [Controller BFF contract](docs/CONTROLLER_BFF_CONTRACT.md)
-for the registered-tenant and Demo transport requirements.
+for the registered-tenant and Demo transport requirements. See
+[Publish entries as an organization controller](docs/REGISTERED_CATALOGUE.md)
+for the phone-authenticated Test Network catalogue.
 
 One deployed service can render either the tenant-controller workspace
 or the separate host-controller workspace from an exact private hostname
