@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { ControllerWorkspace } from 'antifraud-sdk-node-ts'
 import { controllerGatewayFailureStatus } from '../src/config/controller-features'
-import { controllerFeatures } from '../src/server/controller-gateway-capabilities'
+import { controllerFeatures, controllerWorkspaceResult } from '../src/server/controller-gateway-capabilities'
 import { executeControllerAction } from '../src/server/controller-administration'
 
 const workspace = {
@@ -40,6 +40,19 @@ describe('gateway capabilities', () => {
     })
     expect(controllerFeatures(undefined, ['clearing-house'], 'forbidden')).toMatchObject({
       organization: 'forbidden', groups: 'forbidden', 'clearing-house': 'unsupported',
+    })
+  })
+
+  it('does not infer resource support from a missing aggregate route', () => {
+    const failure = controllerGatewayFailureStatus(404)
+    expect(controllerWorkspaceResult(undefined, ['groups'], failure)).toMatchObject({
+      features: {
+        organization: 'unavailable',
+        workforce: 'unavailable',
+        departments: 'unavailable',
+        groups: 'unsupported',
+        'clearing-house': 'available',
+      },
     })
   })
 

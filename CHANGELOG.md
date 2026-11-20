@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Document the resource-specific controller BFF contract and report an
+  unavailable workspace separately from unsupported resource capabilities.
+
 - Show controller availability per gateway feature. Unsupported groups,
   departments, evidence, or Clearing House operations leave other features
   accessible. Keep existing assignments when editing just one membership type.

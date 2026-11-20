@@ -1,6 +1,9 @@
 # Controller delivery status
 
-Implemented and executable locally:
+See the [controller BFF contract](CONTROLLER_BFF_CONTRACT.md) for the
+resource-specific gateway operations and the current migration status.
+
+Implemented and executable locally with the current Demo gateway:
 
 - authenticated organization context;
 - gateway-owned employee, invitation, licence and device state;

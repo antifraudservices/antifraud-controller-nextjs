@@ -34,6 +34,6 @@ export function controllerWorkspaceResult(
   disabled: readonly ControllerFeature[],
   failure?: ControllerFeatureStatus,
 ) {
-  const features = controllerFeatures(workspace, disabled, failure)
+  const features = controllerFeatures(workspace, disabled, failure === 'unsupported' ? 'unavailable' : failure)
   return { features, workspace }
 }
