@@ -1,12 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ControllerWorkspace as ControllerWorkspaceState } from 'antifraud-sdk-node-ts'
 import { OrganizationWorkforceAdministration, type OrganizationWorkforceCopy, type WorkforceEmployee, type WorkforceInvitation } from 'antifraud-hosting-components-react'
 import { EmployeeMembershipDirectory, OrganizationStructureAdministration, type EmployeeOrganizationMembership, type OperationalGroup, type OperationalGroupTemplate, type OrganizationDepartment } from './OrganizationStructureAdministration'
 import { EvidenceAdministration } from './EvidenceAdministration'
 import { ClearingHouseAdministration } from './ClearingHouseAdministration'
 import { controllerFeatureMessage, type ControllerFeature, type ControllerFeatureStatus, type ControllerFeatureStatuses } from '../config/controller-features'
+import { CONTROLLER_RESOURCES, readControllerResources, type ControllerResource, type ControllerResourceResults } from '../config/controller-resources'
+import type { ControllerAction } from '../server/controller-administration'
 import type { PortalModule } from '../config/portal-config'
 import type { EmployeeRoleOption } from '../server/professional-role-policy'
 import type { OrganizationGroupTemplateOption } from '../server/organization-group-policy'
@@ -26,20 +27,24 @@ const workspaceCards: readonly Readonly<{ view: WorkspaceView; module: PortalMod
   { view: 'clearing-house', module: 'clearing-house', features: ['clearing-house'], title: 'Clearing House', description: 'Review evidence references addressed to this organization and record a decision.' },
 ])
 
-type WorkspaceResponse = Readonly<{ workspace?: ControllerWorkspaceState; features: ControllerFeatureStatuses }>
+const NO_DISABLED_FEATURES: readonly ControllerFeature[] = []
+const RESOURCE_NAMES = Object.keys(CONTROLLER_RESOURCES) as ControllerResource[]
+const ACTION_READBACK = {
+  'create-department': ['departments'],
+  'create-group': ['groups'],
+  'create-invitation': ['invitations', 'licences', 'notifications'],
+  'accept-invitation': ['employees', 'invitations', 'licences', 'devices', 'notifications'],
+  'set-status': ['employees', 'notifications'],
+  'set-memberships': ['employees', 'notifications'],
+  'purge-employee': ['employees', 'devices', 'licences', 'notifications'],
+} as const satisfies Record<ControllerAction['type'], readonly ControllerResource[]>
 
-async function readWorkspace(): Promise<WorkspaceResponse> {
-  const response = await fetch('/api/controller/workspace', { cache: 'no-store' })
-  const payload = await response.json() as WorkspaceResponse & { error?: string }
-  if (!response.ok) throw new Error(payload.error ?? 'Controller workspace could not be loaded.')
-  return payload
-}
-
-async function submitAction(action: object): Promise<WorkspaceResponse> {
+async function submitAction(action: ControllerAction): Promise<void> {
   const response = await fetch('/api/controller/actions', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(action) })
-  const payload = await response.json() as WorkspaceResponse & { error?: string }
-  if (!response.ok) throw new Error(payload.error ?? 'Controller action failed.')
-  return payload
+  if (!response.ok) {
+    const payload = await response.json() as { error?: string }
+    throw new Error(payload.error ?? 'Controller action failed.')
+  }
 }
 
 function InformationalPanel({ title, children }: Readonly<{ title: string; children: React.ReactNode }>) {
@@ -54,7 +59,7 @@ function InvitationAssignments({ groups, departments, groupReferences, departmen
   return <section className="membership-directory" aria-labelledby="invitation-assignments-title"><header><div><h2 id="invitation-assignments-title">Initial invitation assignments</h2><p>Optionally choose the groups and departments proposed in the next invitation.</p></div></header><div className="membership-options">{groupsAvailable ? <fieldset><legend>Groups</legend>{groups.map(group => <label key={group.id}><input type="checkbox" checked={groupReferences.includes(group.id)} onChange={event => onGroupsChange(changeSet(groupReferences, group.id, event.currentTarget.checked))}/><span>{group.name}</span></label>)}</fieldset> : null}{departmentsAvailable ? <fieldset><legend>Departments</legend>{departments.map(department => <label key={department.id}><input type="checkbox" checked={departmentReferences.includes(department.id)} onChange={event => onDepartmentsChange(changeSet(departmentReferences, department.id, event.currentTarget.checked))}/><span>{department.name}</span></label>)}</fieldset> : null}</div></section>
 }
 
-export function ControllerWorkspace({ portalName, organizationName, modules, employeeRoles, groupTemplates, disabledFeatures = [] }: Readonly<{
+export function ControllerWorkspace({ portalName, organizationName, modules, employeeRoles, groupTemplates, disabledFeatures = NO_DISABLED_FEATURES }: Readonly<{
   portalName: string
   organizationName: string
   modules?: readonly PortalModule[]
@@ -63,10 +68,24 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   disabledFeatures?: readonly ControllerFeature[]
 }>) {
   const [view, setView] = useState<WorkspaceView>('home')
-  const [result, setResult] = useState<WorkspaceResponse>()
-  const workspace = result?.workspace
+  const [result, setResult] = useState<ControllerResourceResults>({ data: {}, status: {} })
+  const directory = result.data
+  const [employeeFilters, setEmployeeFilters] = useState({ email: '', role: '' })
+  function resourceStatus(...resources: ControllerResource[]): ControllerFeatureStatus | undefined {
+    const statuses = resources.map(resource => result.status[resource])
+    return statuses.find(status => status === 'forbidden')
+      ?? statuses.find(status => status === 'unavailable')
+      ?? statuses.find(status => status === 'unsupported')
+      ?? (statuses.every(status => status === 'available') ? 'available' : undefined)
+  }
   const features: Partial<ControllerFeatureStatuses> = {
-    ...result?.features,
+    organization: resourceStatus('organization'),
+    workforce: resourceStatus('employees', 'licences', 'invitations'),
+    departments: resourceStatus('departments'),
+    groups: resourceStatus('groups'),
+    'identity-evidence': resourceStatus('employees'),
+    'qualification-evidence': resourceStatus('employees'),
+    'clearing-house': 'available',
     ...Object.fromEntries(disabledFeatures.map(feature => [feature, 'unsupported'])),
   }
   const [clearingHouseStatus, setClearingHouseStatus] = useState<ControllerFeatureStatus>()
@@ -78,27 +97,57 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   const [inviteGroupReferences, setInviteGroupReferences] = useState<readonly string[]>([])
   const [inviteDepartmentReferences, setInviteDepartmentReferences] = useState<readonly string[]>([])
 
-  const load = useCallback(() => {
+  const refresh = useCallback(async (resources: readonly ControllerResource[], filters?: typeof employeeFilters) => {
+    return Promise.all(resources.map(async resource => {
+      const next = await readControllerResources([resource], disabledFeatures, fetch, filters)
+      setResult(current => {
+        const data = { ...current.data }
+        delete data[resource]
+        return { data: { ...data, ...next.data }, status: { ...current.status, ...next.status } }
+      })
+      return next.status[resource]
+    }))
+  }, [disabledFeatures])
+  const load = useCallback(() => { void refresh(RESOURCE_NAMES, employeeFilters) }, [employeeFilters, refresh])
+  useEffect(() => { void refresh(RESOURCE_NAMES) }, [refresh])
+
+  const mutate = useCallback(async (action: ControllerAction) => {
+    setBusy(true)
     setError(undefined)
-    void readWorkspace().then(setResult).catch(reason => setError(reason instanceof Error ? reason.message : 'Controller workspace could not be loaded.'))
-  }, [])
-  useEffect(load, [load])
+    try {
+      await submitAction(action)
+      const refreshed = await refresh(ACTION_READBACK[action.type], employeeFilters)
+      if (refreshed.some(status => status !== 'available' && status !== 'unsupported')) {
+        setError('The action was accepted. Some changes could not be checked. Reload before trying again.')
+      }
+      return true
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Controller action failed.')
+      return false
+    } finally {
+      setBusy(false)
+    }
+  }, [employeeFilters, refresh])
 
-  const mutate = useCallback((action: object) => {
-    setBusy(true); setError(undefined)
-    return submitAction(action).then(setResult).catch(reason => setError(reason instanceof Error ? reason.message : 'Controller action failed.')).finally(() => setBusy(false))
-  }, [])
-
-  const employees = useMemo<readonly WorkforceEmployee[]>(() => (workspace?.employees ?? []).map(employee => ({ id: employee.reference, licenseId: employee.licenceReference, email: employee.email, role: employee.role, status: employee.status, deviceCount: employee.deviceReferences?.length ?? 0 })), [workspace])
-  const invitations = useMemo<readonly WorkforceInvitation[]>(() => (workspace?.invitations ?? []).map(invitation => ({ id: invitation.reference, email: invitation.email, role: invitation.role, status: invitation.status as WorkforceInvitation['status'] })), [workspace])
+  const employees = useMemo<readonly WorkforceEmployee[]>(() => {
+    const deviceCounts = new Map(directory.devices?.map(item => [item.employeeReference, item.deviceReferences.length]))
+    return (directory.employees ?? []).map(employee => ({ id: employee.reference, licenseId: employee.licenceReference, email: employee.email, role: employee.role, status: employee.status, deviceCount: deviceCounts.get(employee.reference) }))
+  }, [directory.employees, directory.devices])
+  const invitations = useMemo<readonly WorkforceInvitation[]>(() => (directory.invitations ?? []).map(invitation => ({ id: invitation.reference, email: invitation.email, role: invitation.role, status: invitation.status as WorkforceInvitation['status'] })), [directory])
   const groupsAvailable = features?.groups === 'available'
   const departmentsAvailable = features?.departments === 'available'
-  const groups = useMemo<readonly OperationalGroup[]>(() => (groupsAvailable ? workspace?.groups ?? [] : []).map(group => ({ id: group.reference, name: group.name, template: templateFor(group.capabilities), capabilities: group.capabilities, authorizationReference: group.authorizationReference })), [workspace, groupsAvailable])
-  const departments = useMemo<readonly OrganizationDepartment[]>(() => (departmentsAvailable ? workspace?.departments ?? [] : []).map(department => ({ id: department.reference, name: department.name })), [workspace, departmentsAvailable])
-  const memberships = useMemo<readonly EmployeeOrganizationMembership[]>(() => (workspace?.employees ?? []).map(employee => ({ employeeId: employee.reference, groupIds: employee.groupReferences ?? [], departmentIds: employee.departmentReferences ?? [] })), [workspace])
+  const groups = useMemo<readonly OperationalGroup[]>(() => (groupsAvailable ? directory.groups ?? [] : []).map(group => ({ id: group.reference, name: group.name, template: templateFor(group.capabilities), capabilities: group.capabilities, authorizationReference: group.authorizationReference })), [directory, groupsAvailable])
+  const departments = useMemo<readonly OrganizationDepartment[]>(() => (departmentsAvailable ? directory.departments ?? [] : []).map(department => ({ id: department.reference, name: department.name })), [directory, departmentsAvailable])
+  const memberships = useMemo<readonly EmployeeOrganizationMembership[]>(() => (directory.employees ?? []).map(employee => ({ employeeId: employee.reference, groupIds: employee.groupReferences ?? [], departmentIds: employee.departmentReferences ?? [] })), [directory])
 
   function open(next: WorkspaceView): void { setView(next); window.scrollTo({ top: 0 }) }
-  function invite(): void { void mutate({ type: 'create-invitation', email: email.trim(), role, groupReferences: groupsAvailable ? inviteGroupReferences : [], departmentReferences: departmentsAvailable ? inviteDepartmentReferences : [] }).then(() => { setEmail(''); setRole(''); setUnlockSecret(''); setInviteGroupReferences([]); setInviteDepartmentReferences([]) }) }
+  function invite(): void { void mutate({ type: 'create-invitation', email: email.trim(), role, groupReferences: groupsAvailable ? inviteGroupReferences : [], departmentReferences: departmentsAvailable ? inviteDepartmentReferences : [] }).then(ok => { if (!ok) return; setEmail(''); setRole(''); setUnlockSecret(''); setInviteGroupReferences([]); setInviteDepartmentReferences([]) }) }
+  function searchEmployees(form: HTMLFormElement): void {
+    const values = new FormData(form)
+    const filters = { email: String(values.get('email') ?? '').trim(), role: String(values.get('role') ?? '').trim() }
+    setEmployeeFilters(filters)
+    void refresh(['employees'], filters)
+  }
   function changeMembership(employeeId: string, kind: 'group' | 'department', membershipId: string, enabled: boolean): void {
     if (features?.[kind === 'group' ? 'groups' : 'departments'] !== 'available') return
     const current = memberships.find(item => item.employeeId === employeeId) ?? { employeeId, groupIds: [], departmentIds: [] }
@@ -107,7 +156,7 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   function createGroup(name: string, template: OperationalGroupTemplate): void { void mutate({ type: 'create-group', name, template }) }
   function createDepartment(name: string): void { void mutate({ type: 'create-department', name }) }
 
-  const displayedOrganization = (features?.organization === 'available' && workspace?.organization?.displayName) || organizationName
+  const displayedOrganization = (features?.organization === 'available' && directory.organization?.displayName) || organizationName
   const enabledModules = modules ?? workspaceCards.map(item => item.module)
   const enabledCards = workspaceCards.filter(card => enabledModules.includes(card.module))
   function sectionStatus(section: readonly ControllerFeature[]): ControllerFeatureStatus | undefined {
@@ -128,21 +177,21 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   const roleOptions = employeeRoles ?? [{ value: 'organization-manager', label: 'Organization manager' }, { value: 'evidence-reviewer', label: 'Evidence reviewer' }, { value: 'audit-viewer', label: 'Audit viewer' }]
   return <div className="controller-workspace" data-reuse-source="antifraud-hosting-components-react@1">
     <header className="controller-header"><button type="button" className="controller-brand" onClick={() => open('home')} aria-label={`${portalName} home`}><span className="controller-mark" aria-hidden="true">◇</span><span><strong>{portalName}</strong><small>Organization controller</small></span></button><div className="controller-context"><small>Active organization</small><strong>{displayedOrganization}</strong></div><button type="button" className="controller-account">Controller session</button></header>
-    <nav className="controller-nav" aria-label="Controller workspace"><button type="button" aria-current={view === 'home' ? 'page' : undefined} onClick={() => open('home')}>Home</button>{enabledCards.map(card => <button type="button" key={card.view} aria-current={view === card.view ? 'page' : undefined} data-unavailable={sectionUnavailable(card.features) || undefined} onClick={() => open(card.view)}>{card.title}</button>)}</nav>
+    <nav className="controller-nav" aria-label="Controller administration"><button type="button" aria-current={view === 'home' ? 'page' : undefined} onClick={() => open('home')}>Home</button>{enabledCards.map(card => <button type="button" key={card.view} aria-current={view === card.view ? 'page' : undefined} data-unavailable={sectionUnavailable(card.features) || undefined} onClick={() => open(card.view)}>{card.title}</button>)}</nav>
     <main className="controller-main">
-      <div className="controller-demo-note" role="status"><strong>Authenticated controller workspace</strong><span>{busy ? 'Saving authoritative state…' : 'Organization authority is resolved by the backend and every mutation is reloaded from the gateway.'}</span></div>
+      <div className="controller-demo-note" role="status"><strong>Authenticated controller</strong><span>{busy ? 'Saving authoritative state…' : 'Organization authority is resolved by the backend and every mutation is reloaded from the gateway.'}</span></div>
       {error ? <p role="alert">{error}</p> : null}
-      {view === 'home' ? <><section className="controller-welcome"><span>Organization controller</span><h1>{displayedOrganization}</h1><p>Choose an administrative workspace.</p></section><section className="controller-card-grid" aria-label="Controller capabilities">{enabledCards.map(card => <button type="button" className="controller-card" key={card.view} data-unavailable={sectionUnavailable(card.features) || undefined} onClick={() => open(card.view)}><span aria-hidden="true">→</span><strong>{card.title}</strong><small>{sectionUnavailable(card.features) ? controllerFeatureMessage(sectionStatus(card.features)) : card.description}</small></button>)}</section></> : <>
+      {view === 'home' ? <><section className="controller-welcome"><span>Organization controller</span><h1>{displayedOrganization}</h1><p>Choose an administrative section.</p></section><section className="controller-card-grid" aria-label="Controller capabilities">{enabledCards.map(card => <button type="button" className="controller-card" key={card.view} data-unavailable={sectionUnavailable(card.features) || undefined} onClick={() => open(card.view)}><span aria-hidden="true">→</span><strong>{card.title}</strong><small>{sectionUnavailable(card.features) ? controllerFeatureMessage(sectionStatus(card.features)) : card.description}</small></button>)}</section></> : <>
         <button type="button" className="workspace-back" onClick={() => open('home')}>← Back to controller home</button>
         {currentCard && currentStatus !== 'available' ? <InformationalPanel title={currentCard.title}>
           <p role="status">{controllerFeatureMessage(currentStatus)}</p>
           {currentStatus === 'unavailable' ? <button type="button" onClick={load}>Try again</button> : null}
         </InformationalPanel> : <>
-        {view === 'members' ? <div className="shared-workforce-wrapper"><section className="current-controller-summary" aria-label="Current controller"><span><strong>Authenticated controller</strong><small>Protected controller reservation</small></span><span>Managed by trusted backend state</span></section>{features?.groups === 'unsupported' ? <p role="status">Group assignments are unavailable on this gateway.</p> : null}{features?.departments === 'unsupported' ? <p role="status">Department assignments are unavailable on this gateway.</p> : null}{groupsAvailable || departmentsAvailable ? <InvitationAssignments groupsAvailable={groupsAvailable} departmentsAvailable={departmentsAvailable} groups={groups} departments={departments} groupReferences={inviteGroupReferences} departmentReferences={inviteDepartmentReferences} onGroupsChange={setInviteGroupReferences} onDepartmentsChange={setInviteDepartmentReferences}/> : null}<OrganizationWorkforceAdministration copy={WORKFORCE_COPY} summary={workspace ? { total: workspace.licences.total, used: workspace.licences.assigned, free: workspace.licences.free } : { total: 0, used: 0, free: 0 }} employees={employees} invitations={invitations} roles={roleOptions} email={email} role={role} unlockSecret={unlockSecret} onEmailChange={setEmail} onRoleChange={setRole} onUnlockSecretChange={setUnlockSecret} onInvite={invite} onDisable={id => { void mutate({ type: 'set-status', employeeReference: id, status: 'inactive' }) }} onReactivate={id => { void mutate({ type: 'set-status', employeeReference: id, status: 'active' }) }} onPurge={id => { void mutate({ type: 'purge-employee', employeeReference: id }) }} />{groupsAvailable || departmentsAvailable ? <EmployeeMembershipDirectory groupsAvailable={groupsAvailable} departmentsAvailable={departmentsAvailable} employees={employees} groups={groups} departments={departments} memberships={memberships} onMembershipChange={changeMembership} /> : null}</div> : null}
-        {view === 'organization' ? <InformationalPanel title="Organization information"><p>This state is read from the authenticated gateway organization.</p><dl className="controller-facts"><div><dt>Organization</dt><dd>{displayedOrganization}</dd></div><div><dt>Reference</dt><dd>{workspace?.organization?.reference ?? 'Loading…'}</dd></div><div><dt>Employees</dt><dd>{employees.length}</dd></div><div><dt>Notifications</dt><dd>{workspace?.notifications?.length ?? 0}</dd></div></dl></InformationalPanel> : null}
+        {view === 'members' ? <div className="shared-workforce-wrapper"><form onSubmit={event => { event.preventDefault(); searchEmployees(event.currentTarget) }}><label>Member email <input name="email" type="email" /></label><label>Member role <input name="role" /></label><button type="submit">Search members</button></form>{resourceStatus('devices') !== 'available' ? <p role="status">Devices · {controllerFeatureMessage(resourceStatus('devices'))}</p> : null}<section className="current-controller-summary" aria-label="Current controller"><span><strong>Authenticated controller</strong><small>Protected controller reservation</small></span><span>Managed by trusted backend state</span></section>{features?.groups === 'unsupported' ? <p role="status">Group assignments are unavailable on this gateway.</p> : null}{features?.departments === 'unsupported' ? <p role="status">Department assignments are unavailable on this gateway.</p> : null}{groupsAvailable || departmentsAvailable ? <InvitationAssignments groupsAvailable={groupsAvailable} departmentsAvailable={departmentsAvailable} groups={groups} departments={departments} groupReferences={inviteGroupReferences} departmentReferences={inviteDepartmentReferences} onGroupsChange={setInviteGroupReferences} onDepartmentsChange={setInviteDepartmentReferences}/> : null}<OrganizationWorkforceAdministration copy={WORKFORCE_COPY} summary={directory.licences ? { total: directory.licences.total, used: directory.licences.assigned, free: directory.licences.free } : { total: 0, used: 0, free: 0 }} employees={employees} invitations={invitations} roles={roleOptions} email={email} role={role} unlockSecret={unlockSecret} onEmailChange={setEmail} onRoleChange={setRole} onUnlockSecretChange={setUnlockSecret} onInvite={invite} onDisable={id => { void mutate({ type: 'set-status', employeeReference: id, status: 'inactive' }) }} onReactivate={id => { void mutate({ type: 'set-status', employeeReference: id, status: 'active' }) }} onPurge={id => { void mutate({ type: 'purge-employee', employeeReference: id }) }} />{groupsAvailable || departmentsAvailable ? <EmployeeMembershipDirectory groupsAvailable={groupsAvailable} departmentsAvailable={departmentsAvailable} employees={employees} groups={groups} departments={departments} memberships={memberships} onMembershipChange={changeMembership} /> : null}</div> : null}
+        {view === 'organization' ? <InformationalPanel title="Organization information"><p>This state is read from the authenticated gateway organization.</p><dl className="controller-facts"><div><dt>Organization</dt><dd>{displayedOrganization}</dd></div><div><dt>Reference</dt><dd>{directory.organization?.reference ?? 'Loading…'}</dd></div><div><dt>Employees</dt><dd>{employees.length}</dd></div><div><dt>Notifications</dt><dd>{directory.notifications?.length ?? 0}</dd></div></dl></InformationalPanel> : null}
         {view === 'departments' ? <OrganizationStructureAdministration mode="departments" employees={employees} groups={groups} departments={departments} memberships={memberships} groupTemplates={groupTemplates} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
         {view === 'groups' ? <OrganizationStructureAdministration mode="groups" employees={employees} groups={groups} departments={departments} memberships={memberships} groupTemplates={groupTemplates} onCreateGroup={createGroup} onCreateDepartment={createDepartment} onMembershipChange={changeMembership} /> : null}
-        {view === 'evidence' ? <EvidenceAdministration employees={workspace?.employees ?? []} identityStatus={features?.['identity-evidence']} qualificationStatus={features?.['qualification-evidence']} /> : null}
+        {view === 'evidence' ? <EvidenceAdministration employees={directory.employees ?? []} identityStatus={features?.['identity-evidence']} qualificationStatus={features?.['qualification-evidence']} /> : null}
         {view === 'clearing-house' ? <ClearingHouseAdministration onAvailabilityChange={setClearingHouseStatus} /> : null}
         </>}
       </>}

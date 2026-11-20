@@ -5,11 +5,12 @@ import { getAuth, inMemoryPersistence, RecaptchaVerifier, setPersistence, signIn
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { HostAdmissionPolicyEditor } from './HostAdmissionPolicyEditor'
 import { HostAdmissionReview } from './HostAdmissionReview'
+import { HostOrganizationAdministration } from './HostOrganizationAdministration'
 
 type FirebaseWebConfig = Readonly<{ apiKey: string; authDomain: string; projectId: string; appId: string }>
 
-export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions, showCataloguePublication }: {
-  firebase: FirebaseWebConfig; sectors: readonly string[]; jurisdictions: readonly string[]; showCataloguePublication?: boolean
+export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions, showCataloguePublication, directoryPortalName }: {
+  firebase: FirebaseWebConfig; sectors: readonly string[]; jurisdictions: readonly string[]; showCataloguePublication?: boolean; directoryPortalName?: string
 }) {
   const captcha = useRef<HTMLDivElement>(null)
   const verifier = useRef<RecaptchaVerifier | null>(null)
@@ -19,7 +20,7 @@ export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions, sho
   const [user, setUser] = useState<User>()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const [view, setView] = useState<'policy' | 'review'>('policy')
+  const [view, setView] = useState<'policy' | 'review' | 'directory'>('policy')
 
   useEffect(() => () => verifier.current?.clear(), [])
 
@@ -66,16 +67,18 @@ export function HostAdmissionPhoneSignIn({ firebase, sectors, jurisdictions, sho
     setView('policy')
   }
 
-  if (user) return <main className="controller-main">
+  if (user) return <div className="controller-main">
     <button type="button" onClick={() => { void endSession() }}>Sign out</button>
     <nav aria-label="Host admissions">
       <button type="button" aria-pressed={view === 'policy'} onClick={() => setView('policy')}>Admission policy</button>
       <button type="button" aria-pressed={view === 'review'} onClick={() => setView('review')}>Review queue</button>
+      {directoryPortalName ? <button type="button" aria-pressed={view === 'directory'} onClick={() => setView('directory')}>Organization registry</button> : null}
     </nav>
     {view === 'policy'
       ? <HostAdmissionPolicyEditor sectors={sectors} getToken={getToken} showCataloguePublication={showCataloguePublication}/>
-      : <HostAdmissionReview sectors={sectors} jurisdictions={jurisdictions} getToken={getToken}/>}
-  </main>
+      : view === 'review' ? <HostAdmissionReview sectors={sectors} jurisdictions={jurisdictions} getToken={getToken}/>
+        : directoryPortalName ? <HostOrganizationAdministration portalName={directoryPortalName} allowedSectors={sectors} getToken={getToken}/> : null}
+  </div>
 
   return <main className="controller-main">
     <h1>Host controller sign-in</h1>

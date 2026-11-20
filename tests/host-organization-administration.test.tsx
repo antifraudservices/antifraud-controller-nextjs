@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { HostOrganizationAdministration } from '../src/components/HostOrganizationAdministration'
 import { executeHostOrganizationLifecycle, searchHostOrganizations } from '../src/server/host-organization-administration'
-import { resolveHostOperatorAccess } from '../src/security/host-operator-authority'
+import { authorizeHostDirectoryOperator, resolveHostOperatorAccess } from '../src/security/host-operator-authority'
 
 describe('host organization administration', () => {
   it('renders a separate host workspace with bounded search and lifecycle language', () => {
@@ -26,6 +26,24 @@ describe('host organization administration', () => {
     expect(resolveHostOperatorAccess({ NODE_ENV: 'production', HOST_CONTROLLER_DEMO_MODE: 'true' })).toEqual({ authenticated: false })
     expect(resolveHostOperatorAccess({ NODE_ENV: 'development', HOST_CONTROLLER_DEMO_MODE: 'true', HOST_CONTROLLER_DEMO_SUBJECT: 'host-admin-1' }))
       .toEqual({ authenticated: true, subject: 'host-admin-1' })
+  })
+
+  it('forwards only a verified token belonging to the configured host operator', async () => {
+    const operator = resolveHostOperatorAccess({
+      NODE_ENV: 'development', HOST_CONTROLLER_DEMO_MODE: 'true', HOST_CONTROLLER_DEMO_SUBJECT: 'host-admin-1',
+    })
+    if (!operator.authenticated) throw new Error('Synthetic host operator fixture not initialized')
+    const verify = vi.fn().mockResolvedValue({ uid: operator.subject })
+    const authorization = 'Bearer synthetic-host-directory-id-token'
+    await expect(authorizeHostDirectoryOperator(authorization, operator.subject, verify))
+      .resolves.toBe('synthetic-host-directory-id-token')
+    expect(verify).toHaveBeenCalledWith('synthetic-host-directory-id-token')
+    await expect(authorizeHostDirectoryOperator(authorization, 'other-operator', verify)).resolves.toBeUndefined()
+    verify.mockRejectedValueOnce(new Error('revoked session'))
+    await expect(authorizeHostDirectoryOperator(authorization, operator.subject, verify)).resolves.toBeUndefined()
+    verify.mockClear()
+    await expect(authorizeHostDirectoryOperator('', operator.subject, verify)).resolves.toBeUndefined()
+    expect(verify).not.toHaveBeenCalled()
   })
 
   it('re-resolves the selected tenant before a lifecycle command and reloads afterwards', async () => {

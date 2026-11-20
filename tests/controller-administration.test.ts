@@ -1,16 +1,16 @@
-// Flow contract: the controller backend-for-frontend delegates organization administration to the high-level SDK, never accepts browser-owned organization authority, and returns the refreshed authoritative workspace after every mutation.
+// Flow contract: the controller backend-for-frontend delegates organization administration to the high-level SDK, never accepts browser-owned organization authority, and keeps readback on the affected resource routes.
 import { describe, expect, it, vi } from 'vitest'
 import { executeControllerAction } from '../src/server/controller-administration'
 
 describe('controller administration BFF', () => {
-  it('executes a mutation and reloads authoritative state', async () => {
+  it('executes a mutation without reloading unrelated resources', async () => {
     const client = {
       createControllerDepartment: vi.fn().mockResolvedValue({}),
-      readControllerWorkspace: vi.fn().mockResolvedValue({ organization: { reference: 'organization:one' }, departments: [{ reference: 'department:one', name: 'Operations' }] }),
+      readControllerResource: vi.fn().mockResolvedValue({ organization: { reference: 'organization:one' }, departments: [{ reference: 'department:one', name: 'Operations' }] }),
     }
-    const result = await executeControllerAction(client as never, { type: 'create-department', name: 'Operations' })
+    await executeControllerAction(client as never, { type: 'create-department', name: 'Operations' })
     expect(client.createControllerDepartment).toHaveBeenCalledWith({ name: 'Operations' })
-    expect(result.departments).toHaveLength(1)
+    expect(client.readControllerResource).not.toHaveBeenCalled()
   })
 
   it('rejects browser-owned organization authority', async () => {
@@ -25,7 +25,7 @@ describe('controller administration BFF', () => {
       createControllerClientService: vi.fn().mockResolvedValue({}),
       setControllerPlaceCatalogPublication: vi.fn().mockResolvedValue({}),
       setControllerClientServiceCatalogPublication: vi.fn().mockResolvedValue({}),
-      readControllerWorkspace: vi.fn(),
+      readControllerResource: vi.fn(),
     }
     await expect(executeControllerAction(client as never, {
       type: 'create-place', name: 'Main campus', departmentReference: 'department:one',
@@ -49,7 +49,7 @@ describe('controller administration BFF', () => {
   })
 
   it('rejects a browser-selected role outside trusted hostname policy', async () => {
-    const client = { createControllerInvitation: vi.fn(), readControllerWorkspace: vi.fn() }
+    const client = { createControllerInvitation: vi.fn(), readControllerResource: vi.fn() }
     await expect(executeControllerAction(client as never, {
       type: 'create-invitation', email: 'person@example.invalid', role: 'doctor', groupReferences: [], departmentReferences: [],
     }, { allowedEmployeeRoles: ['organization-manager'] })).rejects.toThrow('employee_role_not_allowed')
@@ -59,7 +59,7 @@ describe('controller administration BFF', () => {
   it('resolves a reviewed group template in the BFF instead of accepting browser capabilities', async () => {
     const client = {
       createControllerGroup: vi.fn().mockResolvedValue({}),
-      readControllerWorkspace: vi.fn().mockResolvedValue({ organization: { reference: 'Organization/example' } }),
+      readControllerResource: vi.fn().mockResolvedValue({ reference: 'Organization/example' }),
     }
     await executeControllerAction(client as never, {
       type: 'create-group', name: 'Schedulers', template: 'scheduling-operations',
@@ -73,7 +73,7 @@ describe('controller administration BFF', () => {
   it('derives public Services management capabilities in the trusted BFF', async () => {
     const client = {
       createControllerGroup: vi.fn().mockResolvedValue({}),
-      readControllerWorkspace: vi.fn().mockResolvedValue({ organization: { reference: 'Organization/example' } }),
+      readControllerResource: vi.fn().mockResolvedValue({ reference: 'Organization/example' }),
     }
     await executeControllerAction(client as never, {
       type: 'create-group', name: 'Public Services managers', template: 'public-services-management',
@@ -85,7 +85,7 @@ describe('controller administration BFF', () => {
   })
 
   it('rejects caller-authored capabilities and templates outside hostname policy', async () => {
-    const client = { createControllerGroup: vi.fn(), readControllerWorkspace: vi.fn() }
+    const client = { createControllerGroup: vi.fn(), readControllerResource: vi.fn() }
     await expect(executeControllerAction(client as never, {
       type: 'create-group', name: 'Injected', template: 'custom', capabilities: ['organization/Anything.*'],
     } as never, { allowedEmployeeRoles: [], allowedGroupTemplates: ['identity-evidence-administration'] })).rejects.toThrow('group_template_not_allowed')

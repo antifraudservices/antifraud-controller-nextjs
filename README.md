@@ -102,12 +102,12 @@ sections explain their availability and the backend enforces the setting.
 Changing a department preserves existing group assignments, including when
 groups are disabled.
 
-The portal distinguishes missing workspace resources, denied requests, and
-temporary errors. Empty resource collections are supported. The current
-controller adapter uses the authenticated `/v1/controller/workspace` contract
-and reads the Clearing House inbox independently. Installations with different
-tenant authentication or legacy routes require a backend adapter for those
-operations.
+The portal reads organization, employees, licences, devices, invitations,
+departments, groups and notifications from independent authenticated BFF
+routes. A missing endpoint affects only its resource. A denied or temporary
+failure has its own status. After a write, the affected resources are read
+again. See the [Controller BFF contract](docs/CONTROLLER_BFF_CONTRACT.md)
+for the registered-tenant and Demo transport requirements.
 
 One deployed service can render either the tenant-controller workspace
 or the separate host-controller workspace from an exact private hostname

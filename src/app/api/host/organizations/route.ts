@@ -1,8 +1,11 @@
 import { headers } from 'next/headers'
+import { getAuth } from 'firebase-admin/auth'
 import { NextResponse } from 'next/server'
-import { resolvePortalDeployment } from '../../../../config/portal-config'
-import { resolveHostOperatorAccess } from '../../../../security/host-operator-authority'
+import { readPortalEnvironment, resolvePortalDeployment } from '../../../../config/portal-config'
+import { authorizeHostDirectoryOperator, resolveHostOperatorAccess } from '../../../../security/host-operator-authority'
 import { createHostOrganizationDirectory, executeHostOrganizationLifecycle, searchHostOrganizations, type HostOrganizationStatus } from '../../../../server/host-organization-administration'
+
+import { getConfiguredAdmissionHostDid, getHostAdmissionFirebaseApp } from '../../../../server/host-admission-runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,14 +21,27 @@ function configuredNetwork(): 'test' | 'local-network' | 'test-network' | 'netwo
   return value as ReturnType<typeof configuredNetwork>
 }
 
+async function hostDirectoryBearer(request: Request): Promise<string | undefined> {
+  const active = readPortalEnvironment().active
+  const network = configuredNetwork()
+  if (active === 'demo' && (network === 'test' || network === 'local-network')) {
+    return resolveHostOperatorAccess().authenticated ? required('SOS_GATEWAY_HOST_BEARER') : undefined
+  }
+  if (active !== 'test-network' || network !== 'test-network' || !getConfiguredAdmissionHostDid()) return undefined
+  const expectedUid = process.env.HOST_ADMIN_UID?.trim()
+  return authorizeHostDirectoryOperator(request.headers.get('authorization') ?? '', expectedUid,
+    token => getAuth(getHostAdmissionFirebaseApp()).verifyIdToken(token, true))
+}
+
 export async function GET(request: Request) {
   const requestHeaders = await headers()
   const deployment = resolvePortalDeployment(requestHeaders.get('host') || 'localhost')
-  const access = resolveHostOperatorAccess()
-  if (deployment.kind !== 'host-controller' || !deployment.modules.includes('host-organizations') || !access.authenticated) {
+  if (deployment.kind !== 'host-controller' || !deployment.modules.includes('host-organizations')) {
     return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
   }
   try {
+    const bearerToken = await hostDirectoryBearer(request)
+    if (!bearerToken) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
     const jurisdiction = required('SOS_GATEWAY_HOST_JURISDICTION')
     if (!deployment.allowedJurisdictions.includes(jurisdiction)) throw new Error('Configured jurisdiction is not enabled for this hostname.')
     const url = new URL(request.url)
@@ -38,7 +54,7 @@ export async function GET(request: Request) {
     if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) return NextResponse.json({ error: 'Invalid page size.' }, { status: 400 })
     const directory = createHostOrganizationDirectory({
       gatewayBaseUrl: required('SOS_GATEWAY_HOST_BASE_URL'),
-      bearerToken: required('SOS_GATEWAY_HOST_BEARER'),
+      bearerToken,
       jurisdiction,
       network: configuredNetwork(),
       appId: required('SOS_GATEWAY_HOST_APP_ID'),
@@ -60,9 +76,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const requestHeaders = await headers()
   const deployment = resolvePortalDeployment(requestHeaders.get('host') || 'localhost')
-  const access = resolveHostOperatorAccess()
-  if (deployment.kind !== 'host-controller' || !deployment.modules.includes('host-organizations') || !access.authenticated) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
+  if (deployment.kind !== 'host-controller' || !deployment.modules.includes('host-organizations')) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
   try {
+    const bearerToken = await hostDirectoryBearer(request)
+    if (!bearerToken) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
     const jurisdiction = required('SOS_GATEWAY_HOST_JURISDICTION')
     if (!deployment.allowedJurisdictions.includes(jurisdiction)) throw new Error('Configured jurisdiction is not enabled for this hostname.')
     const body = await request.json() as Record<string, unknown>
@@ -72,7 +89,7 @@ export async function POST(request: Request) {
     if (!['_status', '_disable', '_enable', '_purge'].includes(action)) return NextResponse.json({ error: 'Invalid lifecycle action.' }, { status: 400 })
     const sector = String(body.sector || '').trim()
     if (!sector || !deployment.allowedSectors.includes(sector)) return NextResponse.json({ error: 'Sector is not enabled for this hostname.' }, { status: 400 })
-    const directory = createHostOrganizationDirectory({ gatewayBaseUrl: required('SOS_GATEWAY_HOST_BASE_URL'), bearerToken: required('SOS_GATEWAY_HOST_BEARER'), jurisdiction, network: configuredNetwork(), appId: required('SOS_GATEWAY_HOST_APP_ID'), appVersion: process.env.npm_package_version || '0.1.0' })
+    const directory = createHostOrganizationDirectory({ gatewayBaseUrl: required('SOS_GATEWAY_HOST_BASE_URL'), bearerToken, jurisdiction, network: configuredNetwork(), appId: required('SOS_GATEWAY_HOST_APP_ID'), appVersion: process.env.npm_package_version || '0.1.0' })
     return NextResponse.json(await executeHostOrganizationLifecycle(directory, { action: action as '_status' | '_disable' | '_enable' | '_purge', sector, identifierType: String(body.identifierType || ''), identifierValue: String(body.identifierValue || ''), sameAs: String(body.sameAs || '') || undefined }))
   } catch (cause) {
     return NextResponse.json({ error: cause instanceof Error ? cause.message : 'Host organization lifecycle failed.' }, { status: 502 })

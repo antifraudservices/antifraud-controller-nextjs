@@ -11,16 +11,20 @@ const COPY: HostOrganizationDirectoryCopy = Object.freeze({
   purgeConfirmation: 'Permanently delete {organization}? This cannot be undone.',
 })
 
-export function HostOrganizationAdministration({ portalName, allowedSectors = [] }: Readonly<{ portalName: string; allowedSectors?: readonly string[] }>) {
+export function HostOrganizationAdministration({ portalName, allowedSectors = [], getToken }: Readonly<{ portalName: string; allowedSectors?: readonly string[]; getToken?: () => Promise<string> }>) {
   const [page, setPage] = useState<HostOrganizationPage>(EMPTY_PAGE)
   const [filters, setFilters] = useState<HostOrganizationDirectorySearch>({ legalName: '', sector: allowedSectors[0] || '', status: '' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
+  async function authorization(): Promise<HeadersInit> {
+    return getToken ? { Authorization: `Bearer ${await getToken()}` } : {}
+  }
+
   async function lifecycle(action: HostOrganizationLifecycleAction, organization: HostOrganizationDirectoryItem) {
     setBusy(true); setError('')
     try {
-      const response = await fetch('/api/host/organizations', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action, sector: organization.sector, identifierType: organization.identifierType, identifierValue: organization.identifierValue, sameAs: organization.sameAs }) })
+      const response = await fetch('/api/host/organizations', { method: 'POST', headers: { ...await authorization(), 'content-type': 'application/json' }, body: JSON.stringify({ action, sector: organization.sector, identifierType: organization.identifierType, identifierValue: organization.identifierValue, sameAs: organization.sameAs }) })
       const body = await response.json() as HostOrganizationPage & { error?: string }
       if (!response.ok) throw new Error(body.error || 'The lifecycle operation failed.')
       await load()
@@ -33,7 +37,7 @@ export function HostOrganizationAdministration({ portalName, allowedSectors = []
     setBusy(true); setError('')
     try {
       const params = new URLSearchParams({ ...(input.sector ? { sector: input.sector } : {}), ...(input.status ? { status: input.status } : {}), ...(input.legalName ? { legalName: input.legalName } : {}), ...(input.cursor ? { cursor: input.cursor } : {}) })
-      const response = await fetch(`/api/host/organizations?${params}`, { cache: 'no-store' })
+      const response = await fetch(`/api/host/organizations?${params}`, { cache: 'no-store', headers: await authorization() })
       const body = await response.json() as HostOrganizationPage & { error?: string }
       if (!response.ok) throw new Error(body.error || 'The organization directory is unavailable.')
       setPage(body)

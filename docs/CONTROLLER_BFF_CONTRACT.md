@@ -46,23 +46,19 @@ readback. Verify that an unavailable group operation leaves employee and
 licence reads usable, and that another tenant's identifiers cannot select
 its staff, memberships, or devices.
 
-## Migration status
+## Controller portal routes
 
-The current controller Demo still loads `/api/controller/workspace`, which
-calls the older gateway workspace endpoint and returns an aggregated
-snapshot. It also reloads that snapshot after a mutation. Gateways that
-implement the resource operations alone need the registered-controller BFF
-adapter before the Demo workspace can use them.
+The controller Demo reads `GET /api/controller/organization`,
+`/employees`, `/licences`, `/devices`, `/invitations`, `/departments`,
+`/groups` and `/notifications` as separate requests. Employee search accepts
+`email` and `role` independently or together. After a successful write, the
+portal reloads the affected resources. A missing resource route disables
+its capability without disabling other sections. A denied or temporarily
+unavailable resource shows a separate status.
 
-Reuse the established tenant profile enrollment, wallet unlock and DCR
-binding for that adapter. The host directory uses separate host authority.
-Keep the independent resource errors visible. A missing aggregate endpoint
-means the workspace could not be loaded. Only trusted feature configuration
-or the targeted resource operation can determine that a capability is
-unsupported.
-
-The migration is verified when a normal controller session can read its
-organization, search employees by email or occupation, and load groups where
-supported. Exercise these requests through the real UI, BFF and gateway, and
-verify that an unavailable group operation leaves employee reads usable.
-Repeat on the local ledger network before a hosted rollout.
+The Demo adapter uses the gateway's individual controller resource endpoints.
+The registered tenant adapter for gateways using the asynchronous DIDComm
+operations needs the same controller enrollment, wallet unlock and device
+binding described above. Host registry searches use separate host authority.
+On a hosted environment the BFF verifies that the controller session
+matches the configured host operator before forwarding it to the host.
