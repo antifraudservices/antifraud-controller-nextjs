@@ -54,17 +54,21 @@ function InvitationAssignments({ groups, departments, groupReferences, departmen
   return <section className="membership-directory" aria-labelledby="invitation-assignments-title"><header><div><h2 id="invitation-assignments-title">Initial invitation assignments</h2><p>Optionally choose the groups and departments proposed in the next invitation.</p></div></header><div className="membership-options">{groupsAvailable ? <fieldset><legend>Groups</legend>{groups.map(group => <label key={group.id}><input type="checkbox" checked={groupReferences.includes(group.id)} onChange={event => onGroupsChange(changeSet(groupReferences, group.id, event.currentTarget.checked))}/><span>{group.name}</span></label>)}</fieldset> : null}{departmentsAvailable ? <fieldset><legend>Departments</legend>{departments.map(department => <label key={department.id}><input type="checkbox" checked={departmentReferences.includes(department.id)} onChange={event => onDepartmentsChange(changeSet(departmentReferences, department.id, event.currentTarget.checked))}/><span>{department.name}</span></label>)}</fieldset> : null}</div></section>
 }
 
-export function ControllerWorkspace({ portalName, organizationName, modules, employeeRoles, groupTemplates }: Readonly<{
+export function ControllerWorkspace({ portalName, organizationName, modules, employeeRoles, groupTemplates, disabledFeatures = [] }: Readonly<{
   portalName: string
   organizationName: string
   modules?: readonly PortalModule[]
   employeeRoles?: readonly EmployeeRoleOption[]
   groupTemplates?: readonly OrganizationGroupTemplateOption[]
+  disabledFeatures?: readonly ControllerFeature[]
 }>) {
   const [view, setView] = useState<WorkspaceView>('home')
   const [result, setResult] = useState<WorkspaceResponse>()
   const workspace = result?.workspace
-  const features = result?.features
+  const features: Partial<ControllerFeatureStatuses> = {
+    ...result?.features,
+    ...Object.fromEntries(disabledFeatures.map(feature => [feature, 'unsupported'])),
+  }
   const [clearingHouseStatus, setClearingHouseStatus] = useState<ControllerFeatureStatus>()
   const [error, setError] = useState<string>()
   const [busy, setBusy] = useState(false)
@@ -107,25 +111,28 @@ export function ControllerWorkspace({ portalName, organizationName, modules, emp
   const enabledModules = modules ?? workspaceCards.map(item => item.module)
   const enabledCards = workspaceCards.filter(card => enabledModules.includes(card.module))
   function sectionStatus(section: readonly ControllerFeature[]): ControllerFeatureStatus | undefined {
-    if (!features) return undefined
     const statuses = section.map(feature => feature === 'clearing-house' && features[feature] === 'available'
       ? clearingHouseStatus ?? 'available'
       : features[feature])
     if (statuses.includes('available')) return 'available'
     if (statuses.includes('unavailable')) return 'unavailable'
     if (statuses.includes('forbidden')) return 'forbidden'
-    return 'unsupported'
+    return statuses.includes(undefined) ? undefined : 'unsupported'
+  }
+  function sectionUnavailable(section: readonly ControllerFeature[]): boolean {
+    const status = sectionStatus(section)
+    return status !== undefined && status !== 'available'
   }
   const currentCard = enabledCards.find(card => card.view === view)
   const currentStatus = view === 'clearing-house' ? features?.['clearing-house'] : currentCard && sectionStatus(currentCard.features)
   const roleOptions = employeeRoles ?? [{ value: 'organization-manager', label: 'Organization manager' }, { value: 'evidence-reviewer', label: 'Evidence reviewer' }, { value: 'audit-viewer', label: 'Audit viewer' }]
   return <div className="controller-workspace" data-reuse-source="antifraud-hosting-components-react@1">
     <header className="controller-header"><button type="button" className="controller-brand" onClick={() => open('home')} aria-label={`${portalName} home`}><span className="controller-mark" aria-hidden="true">◇</span><span><strong>{portalName}</strong><small>Organization controller</small></span></button><div className="controller-context"><small>Active organization</small><strong>{displayedOrganization}</strong></div><button type="button" className="controller-account">Controller session</button></header>
-    <nav className="controller-nav" aria-label="Controller workspace"><button type="button" aria-current={view === 'home' ? 'page' : undefined} onClick={() => open('home')}>Home</button>{enabledCards.map(card => <button type="button" key={card.view} aria-current={view === card.view ? 'page' : undefined} data-unavailable={features && sectionStatus(card.features) !== 'available' || undefined} onClick={() => open(card.view)}>{card.title}</button>)}</nav>
+    <nav className="controller-nav" aria-label="Controller workspace"><button type="button" aria-current={view === 'home' ? 'page' : undefined} onClick={() => open('home')}>Home</button>{enabledCards.map(card => <button type="button" key={card.view} aria-current={view === card.view ? 'page' : undefined} data-unavailable={sectionUnavailable(card.features) || undefined} onClick={() => open(card.view)}>{card.title}</button>)}</nav>
     <main className="controller-main">
       <div className="controller-demo-note" role="status"><strong>Authenticated controller workspace</strong><span>{busy ? 'Saving authoritative state…' : 'Organization authority is resolved by the backend and every mutation is reloaded from the gateway.'}</span></div>
       {error ? <p role="alert">{error}</p> : null}
-      {view === 'home' ? <><section className="controller-welcome"><span>Organization controller</span><h1>{displayedOrganization}</h1><p>Choose an administrative workspace.</p></section><section className="controller-card-grid" aria-label="Controller capabilities">{enabledCards.map(card => <button type="button" className="controller-card" key={card.view} data-unavailable={features && sectionStatus(card.features) !== 'available' || undefined} onClick={() => open(card.view)}><span aria-hidden="true">→</span><strong>{card.title}</strong><small>{features && sectionStatus(card.features) !== 'available' ? controllerFeatureMessage(sectionStatus(card.features)) : card.description}</small></button>)}</section></> : <>
+      {view === 'home' ? <><section className="controller-welcome"><span>Organization controller</span><h1>{displayedOrganization}</h1><p>Choose an administrative workspace.</p></section><section className="controller-card-grid" aria-label="Controller capabilities">{enabledCards.map(card => <button type="button" className="controller-card" key={card.view} data-unavailable={sectionUnavailable(card.features) || undefined} onClick={() => open(card.view)}><span aria-hidden="true">→</span><strong>{card.title}</strong><small>{sectionUnavailable(card.features) ? controllerFeatureMessage(sectionStatus(card.features)) : card.description}</small></button>)}</section></> : <>
         <button type="button" className="workspace-back" onClick={() => open('home')}>← Back to controller home</button>
         {currentCard && currentStatus !== 'available' ? <InformationalPanel title={currentCard.title}>
           <p role="status">{controllerFeatureMessage(currentStatus)}</p>

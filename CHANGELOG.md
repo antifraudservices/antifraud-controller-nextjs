@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Show server-configured unsupported sections before loading the controller
+  workspace, without marking unresolved independent sections unavailable.
+
 - Document the resource-specific controller BFF contract and report an
   unavailable workspace separately from unsupported resource capabilities.
 

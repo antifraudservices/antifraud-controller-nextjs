@@ -42,5 +42,5 @@ export default async function ControllerEnvironmentPage({ params }: Readonly<{ p
     return <div style={style}>{access.authenticated ? <HostOrganizationAdministration portalName={config.name} allowedSectors={config.allowedSectors}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
   }
   const access = localDemoAccess()
-  return <div style={style}>{access.authenticated ? <ControllerWorkspace portalName={config.name} organizationName="Organization" modules={config.modules} employeeRoles={allowedEmployeeRoleOptions(config.allowedSectors)} groupTemplates={allowedGroupTemplateOptions(config.allowedSectors)}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
+  return <div style={style}>{access.authenticated ? <ControllerWorkspace portalName={config.name} organizationName="Organization" modules={config.modules} disabledFeatures={config.disabledControllerFeatures} employeeRoles={allowedEmployeeRoleOptions(config.allowedSectors)} groupTemplates={allowedGroupTemplateOptions(config.allowedSectors)}/> : <ControllerSignInRequired mode={selected === 'demo' ? 'demo' : 'trusted'} supportUrl={config.supportUrl}/>}</div>
 }
