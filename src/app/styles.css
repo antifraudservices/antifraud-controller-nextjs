@@ -180,3 +180,7 @@ a { color: inherit; }
   .employee-membership > summary { align-items: flex-start; }
   .gate-panel { padding: 26px; }
 }
+
+.controller-nav button[data-unavailable], .controller-card[data-unavailable] { color: var(--afpc-muted); background: var(--afpc-panel); }
+.controller-card[data-unavailable] > span, .controller-card[data-unavailable] small { color: var(--afpc-muted); }
+.controller-card[data-unavailable]:is(:hover, :focus-visible) { border-color: var(--afpc-muted); transform: none; }

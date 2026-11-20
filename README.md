@@ -93,6 +93,22 @@ employee performs the operation from the appropriate professional profile.
 The same person may use the same email for controller and employee invitations,
 but those remain separate profiles and wallets with separate authority.
 
+### Controller gateway capabilities
+
+The trusted hostname profile can define `disabledControllerFeatures`. The
+supported names are `organization`, `workforce`, `departments`, `groups`,
+`identity-evidence`, `qualification-evidence`, and `clearing-house`. Disabled
+sections explain their availability and the backend enforces the setting.
+Changing a department preserves existing group assignments, including when
+groups are disabled.
+
+The portal distinguishes missing workspace resources, denied requests, and
+temporary errors. Empty resource collections are supported. The current
+controller adapter uses the authenticated `/v1/controller/workspace` contract
+and reads the Clearing House inbox independently. Installations with different
+tenant authentication or legacy routes require a backend adapter for those
+operations.
+
 One deployed service can render either the tenant-controller workspace
 or the separate host-controller workspace from an exact private hostname
 manifest. The host workspace lists the protected organization registry and

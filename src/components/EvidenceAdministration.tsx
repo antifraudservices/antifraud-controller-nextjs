@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { controllerFeatureMessage, type ControllerFeatureStatus } from '../config/controller-features'
 import type { QualificationClassificationReference } from 'antifraud-data-utils-ts'
 import { IdentityEvidenceEditor, type IdentityEvidenceEditorSubmission } from 'antifraud-common-components-react'
 import {
@@ -28,7 +29,11 @@ async function attachmentFromFile(file: File): Promise<LocalAttachment> {
   return payload
 }
 
-export function EvidenceAdministration({ employees }: Readonly<{ employees: readonly Readonly<{ reference: string; email: string; status: 'active' | 'inactive' }>[] }>) {
+export function EvidenceAdministration({ employees, identityStatus, qualificationStatus }: Readonly<{
+  employees: readonly Readonly<{ reference: string; email: string; status: 'active' | 'inactive' }>[]
+  identityStatus?: ControllerFeatureStatus
+  qualificationStatus?: ControllerFeatureStatus
+}>) {
   const [identityReceipt, setIdentityReceipt] = useState<{ submission: IdentityEvidenceEditorSubmission; transactionId: string }>()
   const [identityError, setIdentityError] = useState<string>()
   const [issuerResolution, setIssuerResolution] = useState<QualificationEvidenceIssuerResolution>({ phase: 'idle' })
@@ -44,7 +49,9 @@ export function EvidenceAdministration({ employees }: Readonly<{ employees: read
       <p>Controller-authorized organization staff can prepare evidence about employees. The server must still verify the active assignment, group membership and exact capability before recording it.</p>
     </header>
     <div className="evidence-grid">
-      <div className="evidence-panel">
+      {identityStatus !== 'available' ? <div className="evidence-panel">
+        <h3>Identity evidence</h3><p role="status">{controllerFeatureMessage(identityStatus)}</p>
+      </div> : <div className="evidence-panel">
         <IdentityEvidenceEditor
           subjects={employees.map(employee => ({ reference: employee.reference, label: employee.email, disabled: employee.status !== 'active' }))}
           onSubmit={submission => {
@@ -61,8 +68,10 @@ export function EvidenceAdministration({ employees }: Readonly<{ employees: read
         />
         {identityReceipt ? <p className="evidence-receipt" role="status"><strong>Identity evidence recorded</strong><span>{identityReceipt.submission.subjectReference} · {identityReceipt.submission.target.kind} · {identityReceipt.submission.checkReference}</span><code>{identityReceipt.transactionId}</code><small>Gateway-authoritative receipt; the selected environment and its server-owned ledger adapter determine the evidence tier.</small></p> : null}
         {identityError ? <p role="alert">{identityError}</p> : null}
-      </div>
-      <div className="evidence-panel">
+      </div>}
+      {qualificationStatus !== 'available' ? <div className="evidence-panel">
+        <h3>Qualification evidence</h3><p role="status">{controllerFeatureMessage(qualificationStatus)}</p>
+      </div> : <div className="evidence-panel">
         <QualificationClassificationSelector value={classification} onChange={value => {
           setClassification(value)
           setClassificationError(undefined)
@@ -106,7 +115,7 @@ export function EvidenceAdministration({ employees }: Readonly<{ employees: read
         />
         {classificationError ? <p role="alert">{classificationError}</p> : null}
         {attachmentError ? <p role="alert">{attachmentError}</p> : null}
-      </div>
+      </div>}
     </div>
   </section>
 }

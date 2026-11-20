@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Show controller availability per gateway feature. Unsupported groups,
+  departments, evidence, or Clearing House operations leave other features
+  accessible. Keep existing assignments when editing just one membership type.
+
 - Allow assigned host controllers to enable tenant-owned external catalogue
   publication per sector, with a revisioned policy and audit history.
 

@@ -1,5 +1,14 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const controllerProfile = {
+  id: 'local-antifraud-tech', kind: 'organization-controller',
+  name: 'Antifraud Controller', logoUrl: '/brand/controller-mark.svg', accentColor: '#075f68',
+  supportUrl: 'https://github.com/antifraudservices/antifraud-controller-nextjs',
+  modules: ['organization', 'workforce', 'structure', 'evidence', 'clearing-house'],
+  allowedSectors: ['antifraud-tech'], allowedJurisdictions: ['CA-BC'],
+  enrollmentPolicy: 'jurisdiction-provider',
+}
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -49,13 +58,11 @@ export default defineConfig({
         TERMINOLOGY_BASE_URL: 'http://127.0.0.1:3720',
         TERMINOLOGY_SERVICE_TOKEN: 'local-terminology-bff-token',
         CONTROLLER_PORTAL_HOST_PROFILES_JSON: JSON.stringify({
-          '127.0.0.1': {
-            id: 'local-antifraud-tech', kind: 'organization-controller',
-            name: 'Antifraud Controller', logoUrl: '/brand/controller-mark.svg', accentColor: '#075f68',
-            supportUrl: 'https://github.com/antifraudservices/antifraud-controller-nextjs',
-            modules: ['organization', 'workforce', 'structure', 'evidence', 'clearing-house'],
-            allowedSectors: ['antifraud-tech'], allowedJurisdictions: ['CA-BC'],
-            enrollmentPolicy: 'jurisdiction-provider',
+          '127.0.0.1': controllerProfile,
+          localhost: {
+            ...controllerProfile,
+            id: 'local-limited-controller',
+            disabledControllerFeatures: ['groups', 'qualification-evidence'],
           },
         }),
       },

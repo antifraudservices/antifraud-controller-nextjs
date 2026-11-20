@@ -1,12 +1,13 @@
+import { controllerRouteAccess } from '../../../../server/controller-route-access'
 import { NextResponse } from 'next/server'
-import { localDemoAccess } from '../../../../security/demo-access'
 import { localGatewayClient, localOperationReference } from '../../../../server/antifraud-gateway'
 import { normalizeQualificationEvidenceIntent } from '../../../../server/qualification-evidence-intent'
 
 export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
-  if (!localDemoAccess().authenticated) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
+  const access = controllerRouteAccess(request, 'qualification-evidence')
+  if (access.response) return access.response
   try {
     const intent = normalizeQualificationEvidenceIntent(await request.json())
     const result = await localGatewayClient().recordQualificationEvidence({
